@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class LessonCard extends StatelessWidget {
   final String title;
   final int lessonsCount;
-  final IconData icon;
+  final IconData iconLeft;
+  final IconData iconRight;
   final Color iconColor;
 
   const LessonCard({
     Key? key,
     required this.title,
     required this.lessonsCount,
-    required this.icon,
+    required this.iconLeft,
+    required this.iconRight,
     required this.iconColor,
   }) : super(key: key);
 
@@ -28,7 +30,7 @@ class LessonCard extends StatelessWidget {
             CircleAvatar(
               radius: 30,
               backgroundColor: iconColor.withOpacity(0.1),
-              child: Icon(icon, size: 30, color: iconColor),
+              child: Icon(iconLeft, size: 30, color: iconColor),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -45,6 +47,12 @@ class LessonCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(width: 16),
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: iconColor.withOpacity(0.1),
+              child: Icon(iconRight, size: 30, color: iconColor),
             ),
           ],
         ),

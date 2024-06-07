@@ -1,9 +1,10 @@
+import 'package:englishapp/res/assets/icons/flutter-icons-8db9be19/my_flutter_app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'src/presentation/pages/learn_page.dart';
 import 'src/presentation/pages/practice_page.dart';
 import 'src/presentation/pages/exam_page.dart';
-import 'src/presentation/pages/game_page.dart';
+import 'src/presentation/pages/chatbot_page.dart';
 import 'src/presentation/pages/profile_page.dart';
 import 'src/utils/app_localizations.dart';
 
@@ -24,7 +25,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('en');
+  Locale _locale = const Locale('vi'); // Đặt ngôn ngữ mặc định là tiếng Việt
 
   void setLocale(Locale locale) {
     setState(() {
@@ -35,7 +36,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Doralingo ',
+      title: 'Doralingo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -48,8 +49,8 @@ class _MyAppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''), // English
-        Locale('vi', ''), // Vietnamese
+        Locale('en', ''), // Tiếng Anh
+        Locale('vi', ''), // Tiếng Việt
       ],
       home: const HomePage(),
     );
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
     LearnPage(),
     PracticePage(),
     ExamPage(),
-    GamePage(),
+    ChatbotPage(),
     ProfilePage(),
   ];
 
@@ -101,8 +102,8 @@ class _HomePageState extends State<HomePage> {
             label: localizations?.translate('exam') ?? 'Exam',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.games),
-            label: localizations?.translate('game') ?? 'Game',
+            icon: Icon(MyFlutterApp.hand_sparkles),
+            label: localizations?.translate('chatbot') ?? 'Chatbot',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
