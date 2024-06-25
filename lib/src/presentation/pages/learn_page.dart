@@ -1,6 +1,7 @@
+import 'package:englishapp/src/theme/colors.dart';
+import 'package:flutter/material.dart';
 import 'package:englishapp/src/presentation/widgets/lesson_card.dart';
 import 'package:englishapp/src/utils/app_localizations.dart';
-import 'package:flutter/material.dart';
 
 class LearnPage extends StatelessWidget {
   const LearnPage({super.key});
@@ -9,6 +10,7 @@ class LearnPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
     return Scaffold(
+      backgroundColor: AppColors.pageBackground, // Sử dụng màu nền từ AppColors
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [

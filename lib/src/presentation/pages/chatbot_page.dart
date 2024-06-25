@@ -6,11 +6,6 @@ class ChatbotPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chatbot'),
-        backgroundColor: Colors.deepPurpleAccent,
-        elevation: 0,
-      ),
     );
   }
 }

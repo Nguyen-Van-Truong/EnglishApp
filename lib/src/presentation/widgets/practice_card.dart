@@ -1,3 +1,4 @@
+import 'package:englishapp/src/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class PracticeCard extends StatelessWidget {
@@ -21,6 +22,7 @@ class PracticeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.0),
       ),
       elevation: 4,
+      color: AppColors.cardBackground, // Sử dụng màu nền từ AppColors
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -34,16 +36,16 @@ class PracticeCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: AppColors.primaryText, // Sử dụng màu chữ từ AppColors
               ),
             ),
             const SizedBox(height: 16),
             Text(
               '$exercisesCount exercises',
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              style: TextStyle(color: AppColors.secondaryText, fontSize: 16),
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(

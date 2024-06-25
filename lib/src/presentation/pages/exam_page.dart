@@ -9,10 +9,6 @@ class ExamPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations?.translate('exam') ?? 'Exam'),
-        elevation: 0,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(

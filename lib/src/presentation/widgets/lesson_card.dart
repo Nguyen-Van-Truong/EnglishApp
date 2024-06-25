@@ -1,3 +1,4 @@
+import 'package:englishapp/src/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class LessonCard extends StatelessWidget {
@@ -23,6 +24,7 @@ class LessonCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.0),
       ),
       elevation: 4,
+      color: AppColors.cardBackground, // Sử dụng màu nền từ AppColors
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -37,8 +39,20 @@ class LessonCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('$lessonsCount lessons', style: const TextStyle(color: Colors.grey)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText, // Sử dụng màu chữ từ AppColors
+                    ),
+                  ),
+                  Text(
+                    '$lessonsCount lessons',
+                    style: TextStyle(
+                      color: AppColors.secondaryText, // Sử dụng màu chữ phụ từ AppColors
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: 0.0,
@@ -49,10 +63,23 @@ class LessonCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: iconColor.withOpacity(0.1),
-              child: Icon(iconRight, size: 30, color: iconColor),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    iconColor.withOpacity(0.8),
+                    iconColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Center(
+                child: Icon(iconRight, size: 30, color: Colors.white), // Mũi tên màu trắng
+              ),
             ),
           ],
         ),

@@ -1,11 +1,6 @@
-import 'package:englishapp/res/assets/icons/flutter-icons-8db9be19/my_flutter_app_icons.dart';
+import 'package:englishapp/src/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'src/presentation/pages/learn_page.dart';
-import 'src/presentation/pages/practice_page.dart';
-import 'src/presentation/pages/exam_page.dart';
-import 'src/presentation/pages/chatbot_page.dart';
-import 'src/presentation/pages/profile_page.dart';
 import 'src/utils/app_localizations.dart';
 
 void main() {
@@ -25,7 +20,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('vi'); // Đặt ngôn ngữ mặc định là tiếng Việt
+  Locale _locale = const Locale('vi');
 
   void setLocale(Locale locale) {
     setState(() {
@@ -49,72 +44,10 @@ class _MyAppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''), // Tiếng Anh
-        Locale('vi', ''), // Tiếng Việt
+        Locale('en', ''), // English
+        Locale('vi', ''), // Vietnamese
       ],
       home: const HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    LearnPage(),
-    PracticePage(),
-    ExamPage(),
-    ChatbotPage(),
-    ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var localizations = AppLocalizations.of(context);
-    return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: localizations?.translate('learn') ?? 'Learn',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit),
-            label: localizations?.translate('practice') ?? 'Practice',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check_box),
-            label: localizations?.translate('exam') ?? 'Exam',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MyFlutterApp.hand_sparkles),
-            label: localizations?.translate('chatbot') ?? 'Chatbot',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: localizations?.translate('profile') ?? 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
     );
   }
 }

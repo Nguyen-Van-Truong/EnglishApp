@@ -1,4 +1,5 @@
 import 'package:englishapp/src/presentation/widgets/practice_card.dart';
+import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/utils/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,7 @@ class PracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations?.translate('practice') ?? 'Practice'),
-        elevation: 0,
-      ),
+      backgroundColor: AppColors.pageBackground, // Sử dụng màu nền từ AppColors
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
