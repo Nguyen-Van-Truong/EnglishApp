@@ -1,39 +1,44 @@
-import 'package:flutter/material.dart';
-import 'package:englishapp/src/presentation/widgets/icon_widget.dart';
 import 'package:englishapp/src/theme/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/presentation/widgets/icon_widget.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
 
 class Home2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isPinkTheme = themeProvider.themeIndex == 1;
+
     return Scaffold(
-      backgroundColor: AppColors.pageBackground,
+      backgroundColor: isPinkTheme ? AppColors.pageBackgroundPink : AppColors.pageBackground,
       body: Stack(
         children: [
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(),
+                _buildHeader(isPinkTheme),
                 SizedBox(height: 16),
-                _buildChatbotSection(),
+                _buildChatbotSection(isPinkTheme),
                 SizedBox(height: 16),
-                _buildMainSections(),
+                _buildMainSections(isPinkTheme),
               ],
             ),
           ),
-          _buildChatBubbles(),
+          _buildChatBubbles(isPinkTheme),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isPinkTheme) {
     return Container(
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFFA6DB), Color(0xFFFF0099), Color(0xFFFFA6DB)],
+          colors: isPinkTheme ? [AppColors.headerBackgroundPink, AppColors.headerCircle2Pink, AppColors.headerBackgroundPink] : [AppColors.headerBackground, Color(0xFFFF0099), AppColors.headerBackground],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -52,7 +57,7 @@ class Home2 extends StatelessWidget {
                 Text(
                   'Welcome back,',
                   style: TextStyle(
-                    color: AppColors.primaryText,
+                    color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
                     fontSize: 13,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
@@ -62,7 +67,7 @@ class Home2 extends StatelessWidget {
                 Text(
                   'Username',
                   style: TextStyle(
-                    color: AppColors.primaryText,
+                    color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
                     fontSize: 24,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w900,
@@ -95,7 +100,7 @@ class Home2 extends StatelessWidget {
               width: 180,
               height: 180,
               decoration: BoxDecoration(
-                color: Color(0xFFD9D9D9),
+                color: isPinkTheme ? AppColors.headerCircle3Pink : AppColors.headerCircle3,
                 shape: BoxShape.circle,
               ),
               child: Align(
@@ -118,12 +123,12 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildChatbotSection() {
+  Widget _buildChatbotSection(bool isPinkTheme) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: isPinkTheme ? AppColors.cardBackgroundPink : AppColors.cardBackground,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
         ),
@@ -138,7 +143,7 @@ class Home2 extends StatelessWidget {
                   Text(
                     'IMTA ChatBot',
                     style: TextStyle(
-                      color: AppColors.primaryText,
+                      color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
                       fontSize: 20,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w800,
@@ -151,7 +156,7 @@ class Home2 extends StatelessWidget {
                     child: Text(
                       'View History',
                       style: TextStyle(
-                        color: AppColors.primaryText,
+                        color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
                         fontSize: 12,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w400,
@@ -178,11 +183,11 @@ class Home2 extends StatelessWidget {
                     ),
                     child: Center(
                       child: index == 0
-                          ? Icon(Icons.add, color: AppColors.primaryText, size: 24)
+                          ? Icon(Icons.add, color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText, size: 24)
                           : Text(
                         'Chat $index',
                         style: TextStyle(
-                          color: AppColors.primaryText,
+                          color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
                           fontSize: 16,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
@@ -199,7 +204,7 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildMainSections() {
+  Widget _buildMainSections(bool isPinkTheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -208,28 +213,28 @@ class Home2 extends StatelessWidget {
           Text(
             'What should we do today?',
             style: TextStyle(
-              color: AppColors.primaryText,
+              color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
               fontSize: 20,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w800,
             ),
           ),
           SizedBox(height: 8),
-          _buildCard('Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png'),
-          _buildCard('Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png'),
-          _buildCard('Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png'),
-          _buildCard('Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png'),
-          _buildCard('Flashcard', 'lib/res/assets/icon_app/Flashcard.png'),
-          _buildCard('Dictionary', 'lib/res/assets/icon_app/Dictionary.png'),
-          _buildCard('Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png'),
+          _buildCard('Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', isPinkTheme),
+          _buildCard('Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', isPinkTheme),
+          _buildCard('Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', isPinkTheme),
+          _buildCard('Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', isPinkTheme),
+          _buildCard('Flashcard', 'lib/res/assets/icon_app/Flashcard.png', isPinkTheme),
+          _buildCard('Dictionary', 'lib/res/assets/icon_app/Dictionary.png', isPinkTheme),
+          _buildCard('Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', isPinkTheme),
         ],
       ),
     );
   }
 
-  Widget _buildCard(String title, String iconPath) {
+  Widget _buildCard(String title, String iconPath, bool isPinkTheme) {
     return Card(
-      color: AppColors.cardBackground,
+      color: isPinkTheme ? AppColors.cardBackgroundPink : AppColors.cardBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(color: Colors.white, width: 2),
@@ -238,7 +243,7 @@ class Home2 extends StatelessWidget {
         title: Text(
           title,
           style: TextStyle(
-            color: AppColors.primaryText,
+            color: isPinkTheme ? AppColors.primaryTextPink : AppColors.primaryText,
             fontSize: 18,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -256,22 +261,22 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildChatBubbles() {
+  Widget _buildChatBubbles(bool isPinkTheme) {
     return Positioned(
       bottom: 16,
       right: 16,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildTopChatBubble(),
+          _buildTopChatBubble(isPinkTheme),
           SizedBox(height: 8),
-          _buildBottomChatBubble(),
+          _buildBottomChatBubble(isPinkTheme),
         ],
       ),
     );
   }
 
-  Widget _buildTopChatBubble() {
+  Widget _buildTopChatBubble(bool isPinkTheme) {
     String numberText = '0'; // Replace this with the actual dynamic value
     double containerSize = (numberText.length * 8.0).clamp(16.0, 24.0); // Adjust size based on length
 
@@ -279,7 +284,7 @@ class Home2 extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Color(0xFF1B003D),
+        color: isPinkTheme ? AppColors.cardBackgroundPink : Color(0xFF1B003D),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -326,12 +331,12 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomChatBubble() {
+  Widget _buildBottomChatBubble(bool isPinkTheme) {
     return Container(
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Color(0xFF1B003D),
+        color: isPinkTheme ? AppColors.cardBackgroundPink : Color(0xFF1B003D),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(

@@ -1,12 +1,16 @@
-import 'package:englishapp/main.dart';
-import 'package:englishapp/src/utils/app_localizations.dart';
+// lib/src/presentation/pages/profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/utils/app_localizations.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -59,7 +63,9 @@ class ProfilePage extends StatelessWidget {
               onTap: () {},
             ),
             const SizedBox(height: 20),
-            _buildLanguageOption(context),
+            _buildThemeOption(context, themeProvider),
+            const SizedBox(height: 20),
+            _buildLanguageOption(context, themeProvider),
             const SizedBox(height: 20),
             _buildLogoutButton(context),
           ],
@@ -73,8 +79,8 @@ class ProfilePage extends StatelessWidget {
       child: Column(
         children: [
           CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage('lib/res/assets/avatar.jpg')
+              radius: 50,
+              backgroundImage: AssetImage('lib/res/assets/avatar.jpg')
           ),
           const SizedBox(height: 10),
           Text(
@@ -116,15 +122,40 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageOption(BuildContext context) {
+  Widget _buildThemeOption(BuildContext context, ThemeProvider themeProvider) {
+    return ListTile(
+      leading: Icon(Icons.color_lens, color: Colors.blueAccent),
+      title: Text(AppLocalizations.of(context)!.translate('theme')),
+      trailing: DropdownButton<int>(
+        value: themeProvider.themeIndex,
+        onChanged: (int? newThemeIndex) {
+          if (newThemeIndex != null) {
+            themeProvider.setTheme(newThemeIndex);
+          }
+        },
+        items: [
+          DropdownMenuItem(
+            value: 0,
+            child: Text('Purple Theme'),
+          ),
+          DropdownMenuItem(
+            value: 1,
+            child: Text('Pink Theme'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(BuildContext context, ThemeProvider themeProvider) {
     return ListTile(
       leading: Icon(Icons.language, color: Colors.blueAccent),
       title: Text(AppLocalizations.of(context)!.translate('language')),
       trailing: DropdownButton<Locale>(
-        value: Localizations.localeOf(context),
+        value: themeProvider.locale,
         onChanged: (Locale? newLocale) {
           if (newLocale != null) {
-            _changeLanguage(context, newLocale);
+            themeProvider.setLocale(newLocale);
           }
         },
         items: AppLocalizations.supportedLocales.map<DropdownMenuItem<Locale>>((Locale locale) {
@@ -135,10 +166,6 @@ class ProfilePage extends StatelessWidget {
         }).toList(),
       ),
     );
-  }
-
-  void _changeLanguage(BuildContext context, Locale locale) {
-    MyApp.setLocale(context, locale);
   }
 
   Widget _buildLogoutButton(BuildContext context) {
