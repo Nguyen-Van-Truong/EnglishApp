@@ -1,3 +1,4 @@
+import 'package:englishapp/src/presentation/pages/home2_page.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
@@ -8,17 +9,17 @@ import 'package:englishapp/src/presentation/pages/profile_page.dart';
 import 'package:englishapp/src/utils/app_localizations.dart';
 import 'package:englishapp/res/assets/icons/flutter-icons-8db9be19/my_flutter_app_icons.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainNavigationPage extends StatefulWidget {
+  const MainNavigationPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MainNavigationPageState extends State<MainNavigationPage> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    LearnPage(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    Home2(),
     PracticePage(),
     ExamPage(),
     ChatbotPage(),
@@ -53,23 +54,23 @@ class _HomePageState extends State<HomePage> {
   List<BottomNavigationBarItem> _buildBottomNavigationBarItems(AppLocalizations? localizations) {
     return [
       BottomNavigationBarItem(
-        icon: const Icon(Icons.book),
-        label: localizations?.translate('learn') ?? 'Learn',
+        icon: Icon(Icons.home),
+        label: localizations?.translate('home') ?? 'Home',
       ),
       BottomNavigationBarItem(
-        icon: const Icon(Icons.edit),
+        icon: Icon(MyFlutterApp.book_open),
         label: localizations?.translate('practice') ?? 'Practice',
       ),
       BottomNavigationBarItem(
-        icon: const Icon(Icons.check_box),
+        icon: Icon(MyFlutterApp.camera),
         label: localizations?.translate('exam') ?? 'Exam',
       ),
       BottomNavigationBarItem(
-        icon: const Icon(MyFlutterApp.hand_sparkles),
+        icon: Icon(MyFlutterApp.facebook_messenger),
         label: localizations?.translate('chatbot') ?? 'Chatbot',
       ),
       BottomNavigationBarItem(
-        icon: const Icon(Icons.person),
+        icon: Icon(Icons.person),
         label: localizations?.translate('profile') ?? 'Profile',
       ),
     ];
