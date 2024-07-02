@@ -11,6 +11,8 @@ class AppColors {
       'pageBackground': Color(0xFF38036D),
       'cardBackground': Color(0xFF2D0259),
       'cardChatBot': Color(0xFF38036D),
+      'messageUserBackground': Color(0xFF13112F),
+      'messageBotBackground': Color(0xFF1E0101),
       'headerBackground': Color(0xFFFFA6DB),
       'headerCircle1': Color(0xFFE1C9FF),
       'headerCircle2': Color(0xFFB57DFE),
@@ -18,6 +20,8 @@ class AppColors {
       'primaryText': Colors.white,
       'secondaryText': Colors.white70,
       'chatBubbleBackground': Colors.blue,
+      'footerBackground': Colors.blue,
+
     },
     1: {
       'navigationBarBackground': Color(0xFFFF39C7),
@@ -26,6 +30,8 @@ class AppColors {
       'pageBackground': Color(0xFFFFC0CB),
       'cardBackground': Color(0xFFFFB6C1),
       'cardChatBot': Color(0xFFFFFFFF),
+      'messageUserBackground': Color(0xFFFF39C7),
+      'messageBotBackground': Color(0xFFFF39C7),
       'headerBackground': Color(0xFFFFE4E1),
       'headerCircle1': Color(0xFFFFDAB9),
       'headerCircle2': Color(0xFFFFA07A),
@@ -33,19 +39,24 @@ class AppColors {
       'primaryText': Colors.black,
       'secondaryText': Colors.black87,
       'chatBubbleBackground': Colors.pinkAccent,
+      'footerBackground': Colors.pinkAccent,
+
     },
     2: {
-      'navigationBarBackground': Color(0xFFFFB342),
+      'navigationBarBackground': Color(0xFFD98A19),
       'pageBackground': Color(0xFFFFF9C4),
       'cardBackground': Color(0xFFFFF59D),
       'cardChatBot': Color(0xFFFFFFFF),
-      'headerBackground': Color(0xFFFFECB3),
+      'messageUserBackground': Color(0xFFD98A19),
+      'messageBotBackground': Color(0xFFF6810A),
+      'headerBackground': Color(0xFFF5B000),
       'headerCircle1': Color(0xFFFFE082),
       'headerCircle2': Color(0xFFFFD54F),
       'headerCircle3': Color(0xFFFFC107),
       'primaryText': Colors.black,
       'secondaryText': Colors.black87,
       'chatBubbleBackground': Colors.amber,
+      'footerBackground': Colors.amber,
     },
   };
 

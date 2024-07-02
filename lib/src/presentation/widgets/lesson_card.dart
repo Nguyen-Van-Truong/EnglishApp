@@ -1,5 +1,7 @@
 import 'package:englishapp/src/theme/colors.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LessonCard extends StatelessWidget {
   final String title;
@@ -19,12 +21,14 @@ class LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
       elevation: 4,
-      color: AppColors.cardBackground, // Sử dụng màu nền từ AppColors
+      color: AppColors.getColor(themeIndex, 'pageBackground'), // Sử dụng màu nền từ AppColors
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -44,13 +48,13 @@ class LessonCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText, // Sử dụng màu chữ từ AppColors
+                      color: AppColors.getColor(themeIndex, 'primaryText'), // Sử dụng màu chữ từ AppColors
                     ),
                   ),
                   Text(
                     '$lessonsCount lessons',
                     style: TextStyle(
-                      color: AppColors.secondaryText, // Sử dụng màu chữ phụ từ AppColors
+                      color: AppColors.getColor(themeIndex, 'primaryText'), // Sử dụng màu chữ phụ từ AppColors
                     ),
                   ),
                   const SizedBox(height: 8),
