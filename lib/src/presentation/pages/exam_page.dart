@@ -1,4 +1,6 @@
 import 'package:englishapp/src/presentation/pages/home2_page.dart';
+import 'package:englishapp/src/presentation/pages/profile_page2.dart';
+import 'package:englishapp/src/presentation/pages/room_setup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
 import 'package:englishapp/src/theme/colors.dart';
@@ -46,6 +48,33 @@ class ExamPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ChatbotPage()),
+                );
+              },
+            ),
+
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Room Setup Page',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RoomSetupPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Profile2',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage2()),
                 );
               },
             ),
