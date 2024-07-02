@@ -37,44 +37,44 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isPinkTheme = themeProvider.themeIndex == 1;
+    final themeIndex = themeProvider.themeIndex;
 
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: _buildBottomNavigationBarItems(AppLocalizations.of(context), isPinkTheme),
+        items: _buildBottomNavigationBarItems(AppLocalizations.of(context), themeIndex),
         currentIndex: _selectedIndex,
-        selectedItemColor: isPinkTheme ? Colors.white : AppColors.primaryText,
-        unselectedItemColor: isPinkTheme ? Colors.white60 : AppColors.secondaryText,
-        backgroundColor: isPinkTheme ? AppColors.navigationBarBackgroundPink : AppColors.navigationBarBackground,
+        selectedItemColor: AppColors.getColor(themeIndex, 'primaryText'),
+        unselectedItemColor: AppColors.getColor(themeIndex, 'secondaryText'),
+        backgroundColor: AppColors.getColor(themeIndex, 'navigationBarBackground'),
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
     );
   }
 
-  List<BottomNavigationBarItem> _buildBottomNavigationBarItems(AppLocalizations? localizations, bool isPinkTheme) {
+  List<BottomNavigationBarItem> _buildBottomNavigationBarItems(AppLocalizations? localizations, int themeIndex) {
     return [
       BottomNavigationBarItem(
-        icon: Icon(Icons.home, color: isPinkTheme ? Colors.white : null),
+        icon: Icon(Icons.home, color: AppColors.getColor(themeIndex, 'primaryText')),
         label: localizations?.translate('home') ?? 'Home',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.book_open, color: isPinkTheme ? Colors.white : null),
+        icon: Icon(MyFlutterApp.book_open, color: AppColors.getColor(themeIndex, 'primaryText')),
         label: localizations?.translate('practice') ?? 'Practice',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.camera, color: isPinkTheme ? Colors.white : null),
+        icon: Icon(MyFlutterApp.camera, color: AppColors.getColor(themeIndex, 'primaryText')),
         label: localizations?.translate('exam') ?? 'Exam',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.facebook_messenger, color: isPinkTheme ? Colors.white : null),
+        icon: Icon(MyFlutterApp.facebook_messenger, color: AppColors.getColor(themeIndex, 'primaryText')),
         label: localizations?.translate('chatbot') ?? 'Chatbot',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.person, color: isPinkTheme ? Colors.white : null),
+        icon: Icon(Icons.person, color: AppColors.getColor(themeIndex, 'primaryText')),
         label: localizations?.translate('profile') ?? 'Profile',
       ),
     ];

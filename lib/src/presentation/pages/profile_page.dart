@@ -1,4 +1,3 @@
-// lib/src/presentation/pages/profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/utils/app_localizations.dart';
@@ -141,6 +140,10 @@ class ProfilePage extends StatelessWidget {
           DropdownMenuItem(
             value: 1,
             child: Text('Pink Theme'),
+          ),
+          DropdownMenuItem(
+            value: 2,
+            child: Text('Yellow Theme'),
           ),
         ],
       ),

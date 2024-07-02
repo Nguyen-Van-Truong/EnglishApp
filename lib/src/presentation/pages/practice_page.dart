@@ -2,6 +2,8 @@ import 'package:englishapp/src/presentation/widgets/practice_card.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/utils/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
 
 class PracticePage extends StatelessWidget {
   const PracticePage({super.key});
@@ -9,8 +11,11 @@ class PracticePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: AppColors.pageBackground, // Sử dụng màu nền từ AppColors
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'), // Sử dụng màu nền từ AppColors
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
