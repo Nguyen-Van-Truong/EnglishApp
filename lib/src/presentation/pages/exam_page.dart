@@ -1,6 +1,13 @@
+import 'package:englishapp/src/presentation/pages/dictionary_page.dart';
+import 'package:englishapp/src/presentation/pages/dictionary_page2.dart';
+import 'package:englishapp/src/presentation/pages/flashcard_page.dart';
+import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart';
 import 'package:englishapp/src/presentation/pages/home2_page.dart';
+import 'package:englishapp/src/presentation/pages/name_page.dart';
 import 'package:englishapp/src/presentation/pages/profile_page2.dart';
 import 'package:englishapp/src/presentation/pages/room_setup_page.dart';
+import 'package:englishapp/src/presentation/pages/vocabulary_list_page.dart';
+import 'package:englishapp/src/presentation/pages/vocabulary_name_page.dart';
 import 'package:flutter/material.dart';
 import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
 import 'package:englishapp/src/theme/colors.dart';
@@ -75,6 +82,97 @@ class ExamPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage2()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Vocabulary list',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VocabularyListPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Vocabulary Name',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VocabularyNamePage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'FlashCard',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FlashcardPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Name',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NamePage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'DICTIONARY',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DictionaryPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'DICTIONARY2',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DictionaryPage2()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Gradle Writing Exam',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GradeWritingExam()),
                 );
               },
             ),
