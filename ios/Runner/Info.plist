@@ -45,5 +45,16 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Add the following permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to the camera for video calling.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to the microphone for audio during video calling.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

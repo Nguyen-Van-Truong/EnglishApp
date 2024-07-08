@@ -6,6 +6,7 @@ import 'package:englishapp/src/presentation/pages/home2_page.dart';
 import 'package:englishapp/src/presentation/pages/name_page.dart';
 import 'package:englishapp/src/presentation/pages/profile_page2.dart';
 import 'package:englishapp/src/presentation/pages/room_setup_page.dart';
+import 'package:englishapp/src/presentation/pages/virtual_speaking_room.dart';
 import 'package:englishapp/src/presentation/pages/vocabulary_list_page.dart';
 import 'package:englishapp/src/presentation/pages/vocabulary_name_page.dart';
 import 'package:flutter/material.dart';
@@ -173,6 +174,19 @@ class ExamPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => GradeWritingExam()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            ExamCard(
+              title: 'Virtual Speaking Room',
+              exercisesCount: 0,
+              icon: Icons.chat,
+              iconColor: Colors.blueAccent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VirtualSpeakingRoom()),
                 );
               },
             ),
