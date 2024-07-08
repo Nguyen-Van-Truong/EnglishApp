@@ -1,31 +1,38 @@
+// lib/src/presentation/pages/profile_page2.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class ProfilePage2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileHeader(),
+            _buildProfileHeader(themeIndex),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('CURRENT SUBSCRIPTION'),
+                  _buildSectionTitle('CURRENT SUBSCRIPTION', themeIndex),
                   const SizedBox(height: 8),
-                  _buildSubscriptionInfo(),
+                  _buildSubscriptionInfo(themeIndex),
                   const SizedBox(height: 16),
-                  _buildNotificationCard(),
+                  _buildNotificationCard(themeIndex),
                   const SizedBox(height: 16),
-                  _buildSectionTitle('OVERVIEW'),
+                  _buildSectionTitle('OVERVIEW', themeIndex),
                   const SizedBox(height: 8),
-                  _buildOverview(),
+                  _buildOverview(themeIndex),
                 ],
               ),
             ),
@@ -35,12 +42,12 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(int themeIndex) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0xFFFF9900),
+        color: AppColors.getColor(themeIndex, 'headerBackgroundProfile'),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
       ),
       child: Column(
@@ -51,14 +58,14 @@ class ProfilePage2 extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Color(0xFFD9D9D9),
+                  color: AppColors.getColor(themeIndex, 'headerCircle3'),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Text(
                     'Avatar',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 12,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w400,
@@ -74,7 +81,7 @@ class ProfilePage2 extends StatelessWidget {
                     Text(
                       'USERNAME',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.getColor(themeIndex, 'primaryText'),
                         fontSize: 23,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
@@ -87,7 +94,7 @@ class ProfilePage2 extends StatelessWidget {
                           child: Text(
                             'username',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.getColor(themeIndex, 'primaryText'),
                               fontSize: 12,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w400,
@@ -98,14 +105,14 @@ class ProfilePage2 extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           '•',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppColors.getColor(themeIndex, 'primaryText')),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Joined in June 2024',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.getColor(themeIndex, 'primaryText'),
                               fontSize: 12,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w400,
@@ -118,16 +125,16 @@ class ProfilePage2 extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        _buildProfileStat('0', 'Following'),
+                        _buildProfileStat('0', 'Following', themeIndex),
                         const SizedBox(width: 16),
-                        _buildProfileStat('0', 'Followers'),
+                        _buildProfileStat('0', 'Followers', themeIndex),
                       ],
                     ),
                     const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.5),
+                        backgroundColor: AppColors.getColor(themeIndex, 'primaryText').withOpacity(0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -135,7 +142,7 @@ class ProfilePage2 extends StatelessWidget {
                       child: Text(
                         'EDIT PROFILE',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.getColor(themeIndex, 'primaryText'),
                           fontSize: 12,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w700,
@@ -152,13 +159,13 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileStat(String count, String label) {
+  Widget _buildProfileStat(String count, String label, int themeIndex) {
     return Column(
       children: [
         Text(
           count,
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 14,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -167,7 +174,7 @@ class ProfilePage2 extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 10,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
@@ -177,11 +184,11 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, int themeIndex) {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.black,
+        color: AppColors.getColor(themeIndex, 'primaryText'),
         fontSize: 20,
         fontFamily: 'Poppins',
         fontWeight: FontWeight.w700,
@@ -189,12 +196,12 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildSubscriptionInfo() {
+  Widget _buildSubscriptionInfo(int themeIndex) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -203,7 +210,7 @@ class ProfilePage2 extends StatelessWidget {
           Text(
             'Name of subscription',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 15,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w700,
@@ -213,7 +220,7 @@ class ProfilePage2 extends StatelessWidget {
           Text(
             'Expires on June 26, 2024',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 15,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
@@ -224,34 +231,34 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildOverview() {
+  Widget _buildOverview(int themeIndex) {
     return Column(
       children: [
         Row(
           children: [
-            _buildOverviewCard('3', 'Streak day', FlutterLogo()),
+            _buildOverviewCard('3', 'Streak day', FlutterLogo(), themeIndex),
             const SizedBox(width: 16),
-            _buildOverviewCard('974', 'Starpoint', FlutterLogo()),
+            _buildOverviewCard('974', 'Starpoint', FlutterLogo(), themeIndex),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            _buildOverviewCard('8', 'Completed exercise', FlutterLogo()),
+            _buildOverviewCard('8', 'Completed exercise', FlutterLogo(), themeIndex),
             const SizedBox(width: 16),
-            _buildOverviewCard('862', 'Practice in minutes', FlutterLogo()),
+            _buildOverviewCard('862', 'Practice in minutes', FlutterLogo(), themeIndex),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildOverviewCard(String count, String label, Widget icon) {
+  Widget _buildOverviewCard(String count, String label, Widget icon, int themeIndex) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black.withOpacity(0.25)),
+          border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -263,7 +270,7 @@ class ProfilePage2 extends StatelessWidget {
                 Text(
                   count,
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.getColor(themeIndex, 'primaryText'),
                     fontSize: 30,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
@@ -275,7 +282,7 @@ class ProfilePage2 extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.getColor(themeIndex, 'primaryText'),
                 fontSize: 16,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
@@ -288,11 +295,11 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationCard() {
+  Widget _buildNotificationCard(int themeIndex) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0xFFFFDBA6),
+        color: AppColors.getColor(themeIndex, 'messageUserBackground'),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -301,7 +308,7 @@ class ProfilePage2 extends StatelessWidget {
           Text(
             'Your “Name of Subscription” will expire today.',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 15,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w700,
@@ -311,7 +318,7 @@ class ProfilePage2 extends StatelessWidget {
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFFF9900),
+              backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -321,7 +328,7 @@ class ProfilePage2 extends StatelessWidget {
               child: Text(
                 'CONTINUE YOUR SUBSCRIPTION',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.getColor(themeIndex, 'primaryText'),
                   fontSize: 15,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w700,

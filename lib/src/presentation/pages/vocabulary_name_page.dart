@@ -1,5 +1,8 @@
 // lib/src/presentation/pages/vocabulary_name_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class VocabularyNamePage extends StatefulWidget {
   @override
@@ -20,14 +23,17 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'VOCABULARY NAME',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -40,52 +46,52 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildFlashcardSlider(),
+            _buildFlashcardSlider(themeIndex),
             const SizedBox(height: 16),
-            _buildUserInfo(),
+            _buildUserInfo(themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Flashcard', Icons.flash_on),
+            _buildOption('Flashcard', Icons.flash_on, themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Learn', Icons.book),
+            _buildOption('Learn', Icons.book, themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Test', Icons.quiz),
+            _buildOption('Test', Icons.quiz, themeIndex),
             const SizedBox(height: 16),
-            _buildTermsHeader(),
+            _buildTermsHeader(themeIndex),
             const SizedBox(height: 8),
-            _buildTermCard('Word 1', 'Definition 1'),
-            _buildTermCard('Word 2', 'Definition 2'),
-            _buildTermCard('Word 3', 'Definition 3'),
-            _buildTermCard('Word 4', 'Definition 4'),
+            _buildTermCard('Word 1', 'Definition 1', themeIndex),
+            _buildTermCard('Word 2', 'Definition 2', themeIndex),
+            _buildTermCard('Word 3', 'Definition 3', themeIndex),
+            _buildTermCard('Word 4', 'Definition 4', themeIndex),
             const SizedBox(height: 16),
-            _buildFooter(),
+            _buildFooter(themeIndex),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFlashcardSlider() {
+  Widget _buildFlashcardSlider(int themeIndex) {
     return SizedBox(
       height: 300,
       child: PageView.builder(
         controller: _pageController,
         itemBuilder: (context, index) {
           final wordIndex = index % words.length;
-          return _buildFlashcard(words[wordIndex]);
+          return _buildFlashcard(words[wordIndex], themeIndex);
         },
       ),
     );
   }
 
-  Widget _buildFlashcard(String text) {
+  Widget _buildFlashcard(String text, int themeIndex) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8.0),
       width: 250,
       height: 300,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Stack(
         children: [
@@ -94,7 +100,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
               text,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.getColor(themeIndex, 'primaryText'),
                 fontSize: 25,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w500,
@@ -105,7 +111,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
             bottom: 8,
             right: 8,
             child: IconButton(
-              icon: Icon(Icons.zoom_out_map, size: 30),
+              icon: Icon(Icons.zoom_out_map, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
               onPressed: () {
                 // Thêm logic phóng to thẻ từ
               },
@@ -116,7 +122,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildUserInfo() {
+  Widget _buildUserInfo(int themeIndex) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -124,7 +130,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: Color(0xFFD9D9D9),
+              backgroundColor: AppColors.getColor(themeIndex, 'headerCircle3'),
             ),
             const SizedBox(width: 10),
             Column(
@@ -133,7 +139,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
                 Text(
                   'Username',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.getColor(themeIndex, 'primaryText'),
                     fontSize: 16,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
@@ -145,14 +151,14 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.black.withOpacity(0.25)),
+                        color: AppColors.getColor(themeIndex, 'cardBackground'),
+                        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'Role',
                         style: TextStyle(
-                          color: Colors.black.withOpacity(0.25),
+                          color: AppColors.getColor(themeIndex, 'secondaryText'),
                           fontSize: 16,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
@@ -163,7 +169,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
                     Text(
                       '91 terms',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: AppColors.getColor(themeIndex, 'primaryText'),
                         fontSize: 16,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
@@ -179,24 +185,24 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildOption(String title, IconData icon) {
+  Widget _buildOption(String title, IconData icon, int themeIndex) {
     return Container(
       width: double.infinity,
       height: 65,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Row(
         children: [
           SizedBox(width: 16),
-          Icon(icon, size: 30),
+          Icon(icon, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
           SizedBox(width: 16),
           Text(
             title,
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 18,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
@@ -207,14 +213,14 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildTermsHeader() {
+  Widget _buildTermsHeader(int themeIndex) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           'Terms',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 16,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -222,18 +228,18 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
         ),
         DropdownButton<String>(
           value: dropdownValue,
-          icon: Icon(Icons.arrow_drop_down),
+          icon: Icon(Icons.arrow_drop_down, color: AppColors.getColor(themeIndex, 'primaryText')),
           iconSize: 24,
           elevation: 16,
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 16,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
           ),
           underline: Container(
             height: 2,
-            color: Colors.black.withOpacity(0.25),
+            color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25),
           ),
           onChanged: (String? newValue) {
             setState(() {
@@ -252,15 +258,15 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildTermCard(String word, String definition) {
+  Widget _buildTermCard(String word, String definition, int themeIndex) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       width: double.infinity,
       height: 127,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -273,7 +279,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
                   Text(
                     word,
                     style: TextStyle(
-                      color: Colors.black,
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 20,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w700,
@@ -283,7 +289,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
                   Text(
                     definition,
                     style: TextStyle(
-                      color: Colors.black,
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 20,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
@@ -293,13 +299,13 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.volume_up),
+              icon: Icon(Icons.volume_up, color: AppColors.getColor(themeIndex, 'primaryText')),
               onPressed: () {
                 // Thêm logic phát âm từ
               },
             ),
             IconButton(
-              icon: Icon(Icons.star_border),
+              icon: Icon(Icons.star_border, color: AppColors.getColor(themeIndex, 'primaryText')),
               onPressed: () {
                 // Thêm logic đánh dấu từ yêu thích
               },
@@ -310,16 +316,16 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(int themeIndex) {
     return Container(
       margin: const EdgeInsets.only(top: 16.0),
       width: double.infinity,
-      color: Color(0xFFFFDBB0),
+      color: AppColors.getColor(themeIndex, 'footerBackground'),
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFFF9900),
+          backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
           padding: const EdgeInsets.symmetric(vertical: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -328,7 +334,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
         child: Text(
           'Study this set',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,

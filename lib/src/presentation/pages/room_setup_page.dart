@@ -1,17 +1,23 @@
 // lib/src/presentation/pages/room_setup_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class RoomSetupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'ROOM SETUP',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -24,11 +30,11 @@ class RoomSetupPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInputField('NAME'),
+            _buildInputField('NAME', themeIndex),
             const SizedBox(height: 16),
-            _buildInputField('CHARACTER'),
+            _buildInputField('CHARACTER', themeIndex),
             const SizedBox(height: 16),
-            _buildSelectionField('Gender', ['Male', 'Female']),
+            _buildSelectionField('Gender', ['Male', 'Female'], themeIndex),
             const SizedBox(height: 16),
             _buildSelectionField('Job', [
               'Teacher',
@@ -37,13 +43,13 @@ class RoomSetupPage extends StatelessWidget {
               'Waiter',
               'Electrician',
               'Farmer',
-            ]),
+            ], themeIndex),
             const SizedBox(height: 16),
-            _buildLabel('Other feature'),
+            _buildLabel('Other feature', themeIndex),
             const SizedBox(height: 8),
-            _buildFeatureSelection(),
+            _buildFeatureSelection(themeIndex),
             const SizedBox(height: 32),
-            _buildLabel('CONTEXT'),
+            _buildLabel('CONTEXT', themeIndex),
             const SizedBox(height: 8),
             _buildSelectionField('Context', [
               'Restaurant',
@@ -51,15 +57,15 @@ class RoomSetupPage extends StatelessWidget {
               'Hospital',
               'Dental care',
               'Farm',
-            ]),
+            ], themeIndex),
             const SizedBox(height: 16),
-            _buildMockTestSelection(),
+            _buildMockTestSelection(themeIndex),
             const SizedBox(height: 32),
             Center(
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFF60A0A),
+                  backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -68,7 +74,7 @@ class RoomSetupPage extends StatelessWidget {
                 child: Text(
                   'CALL',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.getColor(themeIndex, 'primaryText'),
                     fontSize: 30,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w700,
@@ -82,16 +88,17 @@ class RoomSetupPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label) {
+  Widget _buildInputField(String label, int themeIndex) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label),
+        _buildLabel(label, themeIndex),
         const SizedBox(height: 8),
         TextField(
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.getColor(themeIndex, 'secondaryText')),
             ),
           ),
         ),
@@ -99,11 +106,11 @@ class RoomSetupPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLabel(String label) {
+  Widget _buildLabel(String label, int themeIndex) {
     return Text(
       label,
       style: TextStyle(
-        color: Colors.black,
+        color: AppColors.getColor(themeIndex, 'primaryText'),
         fontSize: 16,
         fontFamily: 'Poppins',
         fontWeight: FontWeight.w700,
@@ -111,11 +118,11 @@ class RoomSetupPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectionField(String label, List<String> options) {
+  Widget _buildSelectionField(String label, List<String> options, int themeIndex) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label),
+        _buildLabel(label, themeIndex),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8.0,
@@ -124,13 +131,13 @@ class RoomSetupPage extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withOpacity(0.25)),
+                border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 option,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.getColor(themeIndex, 'primaryText'),
                   fontSize: 12,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,
@@ -143,7 +150,7 @@ class RoomSetupPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureSelection() {
+  Widget _buildFeatureSelection(int themeIndex) {
     return Wrap(
       spacing: 8.0,
       runSpacing: 8.0,
@@ -151,13 +158,13 @@ class RoomSetupPage extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black.withOpacity(0.25)),
+            border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             'Feature',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 12,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
@@ -168,7 +175,7 @@ class RoomSetupPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMockTestSelection() {
+  Widget _buildMockTestSelection(int themeIndex) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,13 +185,13 @@ class RoomSetupPage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.25)),
+                  border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   'IELTS mocktest',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.getColor(themeIndex, 'primaryText'),
                     fontSize: 12,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
@@ -197,13 +204,13 @@ class RoomSetupPage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.25)),
+                  border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   'TOEIC mocktest',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.getColor(themeIndex, 'primaryText'),
                     fontSize: 12,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,

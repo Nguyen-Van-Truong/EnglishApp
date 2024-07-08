@@ -1,16 +1,23 @@
+// lib/src/presentation/pages/dictionary_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class DictionaryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'DICTIONARY',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -21,46 +28,48 @@ class DictionaryPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildSearchBar(context),
-            _buildSuggestedWords(context),
+            _buildSearchBar(context, themeIndex),
+            _buildSuggestedWords(context, themeIndex),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
+  Widget _buildSearchBar(BuildContext context, int themeIndex) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         width: MediaQuery.of(context).size.width - 32, // Full width minus padding
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getColor(themeIndex, 'cardBackground'),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black.withOpacity(0.25)),
+          border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             children: [
-              Icon(Icons.search, size: 20),
+              Icon(Icons.search, size: 20, color: AppColors.getColor(themeIndex, 'primaryText')),
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Word',
                     border: InputBorder.none,
+                    hintStyle: TextStyle(color: AppColors.getColor(themeIndex, 'secondaryText')),
                   ),
+                  style: TextStyle(color: AppColors.getColor(themeIndex, 'primaryText')),
                 ),
               ),
               const SizedBox(width: 8),
               DropdownButton<String>(
                 value: 'Language',
-                icon: Icon(Icons.arrow_drop_down),
+                icon: Icon(Icons.arrow_drop_down, color: AppColors.getColor(themeIndex, 'primaryText')),
                 iconSize: 24,
                 elevation: 16,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.getColor(themeIndex, 'primaryText'),
                   fontSize: 14,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,
@@ -87,7 +96,7 @@ class DictionaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSuggestedWords(BuildContext context) {
+  Widget _buildSuggestedWords(BuildContext context, int themeIndex) {
     final List<String> suggestedWords = [
       'Suggested word 1',
       'Suggested word 2',
@@ -109,16 +118,16 @@ class DictionaryPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width - 32, // Full width minus padding
             margin: const EdgeInsets.symmetric(vertical: 4.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.getColor(themeIndex, 'cardBackground'),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.25)),
+              border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 word,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.getColor(themeIndex, 'primaryText'),
                   fontSize: 14,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,

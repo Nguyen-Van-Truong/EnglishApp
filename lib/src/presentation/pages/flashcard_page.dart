@@ -1,4 +1,8 @@
+// lib/src/presentation/pages/flashcard_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class FlashcardPage extends StatefulWidget {
   @override
@@ -11,14 +15,17 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'FLASHCARD',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -28,19 +35,19 @@ class _FlashcardPageState extends State<FlashcardPage> {
       ),
       body: Column(
         children: [
-          _buildHeader(),
-          _buildFlashcard(),
-          _buildNavigationButtons(),
+          _buildHeader(themeIndex),
+          _buildFlashcard(themeIndex),
+          _buildNavigationButtons(themeIndex),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(int themeIndex) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0xFFFFDBA6),
+        color: AppColors.getColor(themeIndex, 'headerBackground'),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(10),
           bottomRight: Radius.circular(10),
@@ -58,12 +65,12 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: index == currentIndex
-                      ? Color(0xFFFFA756)
+                      ? AppColors.getColor(themeIndex, 'headerCircle1')
                       : Colors.transparent,
                   border: Border.all(
                     color: index == currentIndex
-                        ? Colors.white
-                        : Colors.white.withOpacity(0.2),
+                        ? AppColors.getColor(themeIndex, 'primaryText')
+                        : AppColors.getColor(themeIndex, 'primaryText').withOpacity(0.2),
                     width: 2,
                   ),
                 ),
@@ -71,7 +78,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
                   child: Text(
                     (index + 1).toString(),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 16,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
@@ -86,16 +93,16 @@ class _FlashcardPageState extends State<FlashcardPage> {
     );
   }
 
-  Widget _buildFlashcard() {
+  Widget _buildFlashcard(int themeIndex) {
     return Expanded(
       child: Center(
         child: Container(
           width: 400,
           height: 595,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'cardBackground'),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black.withOpacity(0.25)),
+            border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
           ),
           child: Stack(
             children: [
@@ -103,13 +110,13 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.volume_up, size: 30),
+                    Icon(Icons.volume_up, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
                     SizedBox(width: 10),
                     Text(
                       words[currentIndex],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.black,
+                        color: AppColors.getColor(themeIndex, 'primaryText'),
                         fontSize: 35,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
@@ -125,7 +132,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildNavigationButtons(int themeIndex) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -138,11 +145,11 @@ class _FlashcardPageState extends State<FlashcardPage> {
               });
             },
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: Colors.white,
+              foregroundColor: AppColors.getColor(themeIndex, 'primaryText'),
+              backgroundColor: AppColors.getColor(themeIndex, 'cardBackground'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: Colors.black.withOpacity(0.25)),
+                side: BorderSide(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
               ),
             ),
             child: Text(
@@ -157,7 +164,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
           Text(
             '${currentIndex + 1}/${words.length}',
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 20,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
@@ -170,11 +177,11 @@ class _FlashcardPageState extends State<FlashcardPage> {
               });
             },
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: Colors.white,
+              foregroundColor: AppColors.getColor(themeIndex, 'primaryText'),
+              backgroundColor: AppColors.getColor(themeIndex, 'cardBackground'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: Colors.black.withOpacity(0.25)),
+                side: BorderSide(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
               ),
             ),
             child: Text(

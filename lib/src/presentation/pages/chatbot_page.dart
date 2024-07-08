@@ -74,6 +74,12 @@ class ChatbotHeader extends StatelessWidget {
       color: AppColors.getColor(themeIndex, 'headerBackground'),
       child: Row(
         children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           CircleAvatar(
             radius: 30,
             backgroundColor: Colors.white,

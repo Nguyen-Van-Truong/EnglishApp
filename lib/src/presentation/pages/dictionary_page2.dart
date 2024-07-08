@@ -1,4 +1,8 @@
+// lib/src/presentation/pages/dictionary_page2.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 import '../widgets/eng_viet_tab.dart';
 import '../widgets/grammar_tab.dart';
 
@@ -12,14 +16,17 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'Word',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -29,7 +36,7 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.volume_up, size: 30),
+            child: Icon(Icons.volume_up, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
           ),
         ],
       ),
@@ -38,7 +45,8 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black.withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'cardBackground'),
+              border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -51,8 +59,8 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
                   children: [
                     TableRow(
                       children: [
-                        _buildTab('ENG - VIET', isEngVietTab),
-                        _buildTab('GRAMMAR', !isEngVietTab),
+                        _buildTab('ENG - VIET', isEngVietTab, themeIndex),
+                        _buildTab('GRAMMAR', !isEngVietTab, themeIndex),
                       ],
                     ),
                   ],
@@ -66,7 +74,7 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
     );
   }
 
-  Widget _buildTab(String title, bool isSelected) {
+  Widget _buildTab(String title, bool isSelected, int themeIndex) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -81,7 +89,7 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: isSelected ? Colors.black : Colors.black.withOpacity(0.5),
+                color: isSelected ? AppColors.getColor(themeIndex, 'primaryText') : AppColors.getColor(themeIndex, 'primaryText').withOpacity(0.5),
                 fontSize: 14,
                 fontFamily: 'Poppins',
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
@@ -90,7 +98,7 @@ class _DictionaryPage2State extends State<DictionaryPage2> {
           ),
           Container(
             height: 2,
-            color: isSelected ? Colors.black : Colors.transparent,
+            color: isSelected ? AppColors.getColor(themeIndex, 'primaryText') : Colors.transparent,
           ),
         ],
       ),

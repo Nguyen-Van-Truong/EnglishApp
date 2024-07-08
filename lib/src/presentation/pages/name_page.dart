@@ -1,16 +1,23 @@
+// lib/src/presentation/pages/name_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class NamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeIndex = themeProvider.themeIndex;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFDBA6),
+        backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
         title: Text(
           'NAME',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.getColor(themeIndex, 'primaryText'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -21,20 +28,20 @@ class NamePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildMainCard(),
-            _buildBottomCard(),
+            _buildHeader(themeIndex),
+            _buildMainCard(themeIndex),
+            _buildBottomCard(themeIndex),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(int themeIndex) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0xFFFFDBA6),
+        color: AppColors.getColor(themeIndex, 'headerBackground'),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(10),
           bottomRight: Radius.circular(10),
@@ -53,11 +60,14 @@ class NamePage extends StatelessWidget {
                   height: 35,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: index == 0 ? Color(0xFFFFA756) : Colors.transparent,
+                    color: index == 0
+                        ? AppColors.getColor(themeIndex, 'headerCircle1')
+                        : Colors.transparent,
                     border: Border.all(
                       color: index == 0
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.2),
+                          ? AppColors.getColor(themeIndex, 'primaryText')
+                          : AppColors.getColor(themeIndex, 'primaryText')
+                          .withOpacity(0.2),
                       width: 2,
                     ),
                   ),
@@ -65,7 +75,7 @@ class NamePage extends StatelessWidget {
                     child: Text(
                       (index + 1).toString(),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.getColor(themeIndex, 'primaryText'),
                         fontSize: 16,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
@@ -81,14 +91,14 @@ class NamePage extends StatelessWidget {
     );
   }
 
-  Widget _buildMainCard() {
+  Widget _buildMainCard(int themeIndex) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       width: 400,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -98,31 +108,31 @@ class NamePage extends StatelessWidget {
               '“Can I try some?” he asked, and the _______ beside the cake, clutching his floppy wet chef\'s hat, merely shrugged.',
               textAlign: TextAlign.justify,
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.getColor(themeIndex, 'primaryText'),
                 fontSize: 16,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(height: 16),
-            _buildOption('knight', true),
-            _buildOption('monarch', true),
-            _buildOption('prophet', false),
-            _buildOption('baker', true),
+            _buildOption('knight', true, themeIndex),
+            _buildOption('monarch', true, themeIndex),
+            _buildOption('prophet', false, themeIndex),
+            _buildOption('baker', true, themeIndex),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                _buildTag('Definition'),
+                _buildTag('Definition', themeIndex),
                 const SizedBox(width: 8),
-                _buildTag('Suggestion'),
+                _buildTag('Suggestion', themeIndex),
               ],
             ),
             const SizedBox(height: 16),
             Text(
               'Describe definition/Suggestion',
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.getColor(themeIndex, 'primaryText'),
                 fontSize: 12,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
@@ -134,7 +144,7 @@ class NamePage extends StatelessWidget {
     );
   }
 
-  Widget _buildOption(String text, bool isCorrect) {
+  Widget _buildOption(String text, bool isCorrect, int themeIndex) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -144,10 +154,14 @@ class NamePage extends StatelessWidget {
             height: 25,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isCorrect ? Colors.white : Color(0xFFF60A0A),
+              color: isCorrect
+                  ? AppColors.getColor(themeIndex, 'cardBackground')
+                  : AppColors.getColor(themeIndex, 'messageBotBackground'),
               border: Border.all(
                 width: 3,
-                color: isCorrect ? Color(0xFF02A71C) : Color(0xFFED1616),
+                color: isCorrect
+                    ? AppColors.getColor(themeIndex, 'headerCircle1')
+                    : AppColors.getColor(themeIndex, 'messageBotBackground'),
               ),
             ),
           ),
@@ -155,7 +169,7 @@ class NamePage extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 16,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
@@ -166,18 +180,18 @@ class NamePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTag(String text) {
+  Widget _buildTag(String text, int themeIndex) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: Colors.black,
+          color: AppColors.getColor(themeIndex, 'primaryText'),
           fontSize: 12,
           fontFamily: 'Poppins',
           fontWeight: FontWeight.w400,
@@ -186,14 +200,14 @@ class NamePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomCard() {
+  Widget _buildBottomCard(int themeIndex) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       width: 400,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.getColor(themeIndex, 'cardBackground'),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.25)),
+        border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -205,7 +219,7 @@ class NamePage extends StatelessWidget {
                   TextSpan(
                     text: 'Well done! ',
                     style: TextStyle(
-                      color: Color(0xFF02A71C),
+                      color: AppColors.getColor(themeIndex, 'headerCircle1'),
                       fontSize: 23,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w700,
@@ -214,7 +228,7 @@ class NamePage extends StatelessWidget {
                   TextSpan(
                     text: '/',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 23,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w700,
@@ -223,7 +237,7 @@ class NamePage extends StatelessWidget {
                   TextSpan(
                     text: ' Try again!',
                     style: TextStyle(
-                      color: Color(0xFFF60A0A),
+                      color: AppColors.getColor(themeIndex, 'messageBotBackground'),
                       fontSize: 23,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w700,
@@ -236,7 +250,7 @@ class NamePage extends StatelessWidget {
             Text(
               'Solve the question and give brief describe',
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.getColor(themeIndex, 'primaryText'),
                 fontSize: 12,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
