@@ -1,4 +1,3 @@
-// lib/src/presentation/pages/vocabulary_name_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
@@ -33,7 +32,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
         title: Text(
           'VOCABULARY NAME',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -50,11 +49,11 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
             const SizedBox(height: 16),
             _buildUserInfo(themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Flashcard', Icons.flash_on, themeIndex),
+            _buildOption('Flashcard', 'lib/res/assets/icon_app/icFlashcard.png', themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Learn', Icons.book, themeIndex),
+            _buildOption('Learn', 'lib/res/assets/icon_app/icLearn.png', themeIndex),
             const SizedBox(height: 16),
-            _buildOption('Test', Icons.quiz, themeIndex),
+            _buildOption('Test', 'lib/res/assets/icon_app/icTest.png', themeIndex),
             const SizedBox(height: 16),
             _buildTermsHeader(themeIndex),
             const SizedBox(height: 8),
@@ -185,7 +184,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
     );
   }
 
-  Widget _buildOption(String title, IconData icon, int themeIndex) {
+  Widget _buildOption(String title, String iconPath, int themeIndex) {
     return Container(
       width: double.infinity,
       height: 65,
@@ -197,7 +196,7 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
       child: Row(
         children: [
           SizedBox(width: 16),
-          Icon(icon, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
+          Image.asset(iconPath, width: 30, height: 30),
           SizedBox(width: 16),
           Text(
             title,
@@ -322,22 +321,25 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
       width: double.infinity,
       color: AppColors.getColor(themeIndex, 'footerBackground'),
       padding: const EdgeInsets.all(16.0),
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: double.infinity, // Set width to fill parent
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-        ),
-        child: Text(
-          'Study this set',
-          style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
-            fontSize: 25,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w700,
+          child: Text(
+            'Study this set',
+            style: TextStyle(
+              color: AppColors.getColor(themeIndex, 'primaryText'),
+              fontSize: 25,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),

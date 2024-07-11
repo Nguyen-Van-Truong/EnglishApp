@@ -25,11 +25,15 @@ class _FlashcardPageState extends State<FlashcardPage> {
         title: Text(
           'FLASHCARD',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
+
           ),
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white,
         ),
         centerTitle: true,
       ),
@@ -40,6 +44,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
           _buildNavigationButtons(themeIndex),
         ],
       ),
+
     );
   }
 
@@ -65,12 +70,12 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: index == currentIndex
-                      ? AppColors.getColor(themeIndex, 'headerCircle1')
+                      ? AppColors.getColor(themeIndex, 'headerCircle4')
                       : Colors.transparent,
                   border: Border.all(
                     color: index == currentIndex
-                        ? AppColors.getColor(themeIndex, 'primaryText')
-                        : AppColors.getColor(themeIndex, 'primaryText').withOpacity(0.2),
+                        ? AppColors.getColor(themeIndex, 'primaryTextHeader')
+                        : AppColors.getColor(themeIndex, 'primaryTextHeader').withOpacity(0.2),
                     width: 2,
                   ),
                 ),
@@ -78,7 +83,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
                   child: Text(
                     (index + 1).toString(),
                     style: TextStyle(
-                      color: AppColors.getColor(themeIndex, 'primaryText'),
+                      color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                       fontSize: 16,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,

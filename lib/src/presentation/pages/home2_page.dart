@@ -1,8 +1,10 @@
-// lib/src/presentation/pages/home_page.dart
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/flash_sale_section.dart';
+import '../widgets/suggestion_section.dart';
 
 class Home2 extends StatelessWidget {
   @override
@@ -19,6 +21,10 @@ class Home2 extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(themeIndex),
+                SizedBox(height: 16),
+                FlashSaleSection(), // Thêm dòng này
+                SizedBox(height: 16),
+                SuggestionSection(), // Thêm dòng này
                 SizedBox(height: 16),
                 _buildChatbotSection(themeIndex),
                 SizedBox(height: 16),
@@ -61,7 +67,7 @@ class Home2 extends StatelessWidget {
                 Text(
                   'Welcome back,',
                   style: TextStyle(
-                    color: AppColors.getColor(themeIndex, 'primaryText'),
+                    color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                     fontSize: 13,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
@@ -71,7 +77,7 @@ class Home2 extends StatelessWidget {
                 Text(
                   'Username',
                   style: TextStyle(
-                    color: AppColors.getColor(themeIndex, 'primaryText'),
+                    color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                     fontSize: 24,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w900,
@@ -134,7 +140,7 @@ class Home2 extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.getColor(themeIndex, 'cardBackground'),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+          border: Border.all(color: AppColors.getColor(themeIndex, 'border')),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,6 +190,8 @@ class Home2 extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.getColor(themeIndex, 'cardChatBot'),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.getColor(themeIndex, 'border')),
+
                     ),
                     child: Center(
                       child: index == 0

@@ -46,7 +46,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: _buildBottomNavigationBarItems(AppLocalizations.of(context), themeIndex),
         currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.getColor(themeIndex, 'primaryText'),
+        selectedItemColor: AppColors.getColor(themeIndex, 'chooseNavigationBarBackground'),
         unselectedItemColor: AppColors.getColor(themeIndex, 'secondaryText'),
         backgroundColor: AppColors.getColor(themeIndex, 'navigationBarBackground'),
         onTap: _onItemTapped,
@@ -58,23 +58,23 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   List<BottomNavigationBarItem> _buildBottomNavigationBarItems(AppLocalizations? localizations, int themeIndex) {
     return [
       BottomNavigationBarItem(
-        icon: Icon(Icons.home, color: AppColors.getColor(themeIndex, 'primaryText')),
+        icon: Icon(Icons.home),
         label: localizations?.translate('home') ?? 'Home',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.book_open, color: AppColors.getColor(themeIndex, 'primaryText')),
+        icon: Icon(MyFlutterApp.book_open),
         label: localizations?.translate('practice') ?? 'Practice',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.camera, color: AppColors.getColor(themeIndex, 'primaryText')),
+        icon: Icon(MyFlutterApp.camera),
         label: localizations?.translate('exam') ?? 'Exam',
       ),
       BottomNavigationBarItem(
-        icon: Icon(MyFlutterApp.facebook_messenger, color: AppColors.getColor(themeIndex, 'primaryText')),
+        icon: Icon(MyFlutterApp.facebook_messenger),
         label: localizations?.translate('chatbot') ?? 'Chatbot',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.person, color: AppColors.getColor(themeIndex, 'primaryText')),
+        icon: Icon(Icons.person),
         label: localizations?.translate('profile') ?? 'Profile',
       ),
     ];

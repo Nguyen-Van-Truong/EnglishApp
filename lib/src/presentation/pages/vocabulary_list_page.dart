@@ -17,7 +17,7 @@ class VocabularyListPage extends StatelessWidget {
         title: Text(
           'VOCABULARY LIST',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -63,7 +63,7 @@ class VocabularyListPage extends StatelessWidget {
         Text(
           actionText,
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'seeAllVocabularyList'),
             fontSize: 14,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w500,

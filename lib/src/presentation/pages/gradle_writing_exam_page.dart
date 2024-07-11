@@ -17,11 +17,14 @@ class GradeWritingExam extends StatelessWidget {
           'NAME OF ESSAY',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
           ),
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white,
         ),
         centerTitle: true,
       ),

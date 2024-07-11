@@ -17,11 +17,14 @@ class DictionaryPage extends StatelessWidget {
         title: Text(
           'DICTIONARY',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
           ),
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white,
         ),
         centerTitle: true,
       ),
@@ -42,7 +45,7 @@ class DictionaryPage extends StatelessWidget {
       child: Container(
         width: MediaQuery.of(context).size.width - 32, // Full width minus padding
         decoration: BoxDecoration(
-          color: AppColors.getColor(themeIndex, 'cardBackground'),
+          color: AppColors.getColor(themeIndex, 'searchDictionaryBackground'),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
         ),

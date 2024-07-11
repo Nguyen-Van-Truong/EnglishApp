@@ -1,4 +1,3 @@
-// lib/src/presentation/pages/room_setup_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
@@ -17,13 +16,16 @@ class RoomSetupPage extends StatelessWidget {
         title: Text(
           'ROOM SETUP',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
           ),
         ),
         centerTitle: true,
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -62,22 +64,25 @@ class RoomSetupPage extends StatelessWidget {
             _buildMockTestSelection(themeIndex),
             const SizedBox(height: 32),
             Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: double.infinity, // Set width to fill parent
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.getColor(themeIndex, 'buttonCall'),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
-                child: Text(
-                  'CALL',
-                  style: TextStyle(
-                    color: AppColors.getColor(themeIndex, 'primaryText'),
-                    fontSize: 30,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w700,
+                  child: Text(
+                    'CALL',
+                    style: TextStyle(
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
+                      fontSize: 30,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),

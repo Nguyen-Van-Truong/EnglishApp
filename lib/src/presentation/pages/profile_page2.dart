@@ -1,4 +1,3 @@
-// lib/src/presentation/pages/profile_page2.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
@@ -81,7 +80,7 @@ class ProfilePage2 extends StatelessWidget {
                     Text(
                       'USERNAME',
                       style: TextStyle(
-                        color: AppColors.getColor(themeIndex, 'primaryText'),
+                        color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                         fontSize: 23,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
@@ -94,7 +93,7 @@ class ProfilePage2 extends StatelessWidget {
                           child: Text(
                             'username',
                             style: TextStyle(
-                              color: AppColors.getColor(themeIndex, 'primaryText'),
+                              color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                               fontSize: 12,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w400,
@@ -105,14 +104,14 @@ class ProfilePage2 extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           '•',
-                          style: TextStyle(color: AppColors.getColor(themeIndex, 'primaryText')),
+                          style: TextStyle(color: AppColors.getColor(themeIndex, 'primaryTextHeader')),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Joined in June 2024',
                             style: TextStyle(
-                              color: AppColors.getColor(themeIndex, 'primaryText'),
+                              color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                               fontSize: 12,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w400,
@@ -131,23 +130,39 @@ class ProfilePage2 extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.getColor(themeIndex, 'primaryText').withOpacity(0.5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.getColor(themeIndex, 'headerBackgroundProfile'),
+                            side: BorderSide(color: Colors.white),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'EDIT PROFILE',
+                            style: TextStyle(
+                              color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'EDIT PROFILE',
-                        style: TextStyle(
-                          color: AppColors.getColor(themeIndex, 'primaryText'),
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w700,
+                        const SizedBox(width: 8), // Khoảng cách nhỏ giữa button và icon
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white), // Border màu trắng
+                            borderRadius: BorderRadius.circular(4), // Bo tròn góc nếu cần
+                          ),
+                          child: Icon(
+                            Icons.ios_share_outlined,
+                            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -165,7 +180,7 @@ class ProfilePage2 extends StatelessWidget {
         Text(
           count,
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 14,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -174,7 +189,7 @@ class ProfilePage2 extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 10,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
@@ -236,24 +251,24 @@ class ProfilePage2 extends StatelessWidget {
       children: [
         Row(
           children: [
-            _buildOverviewCard('3', 'Streak day', FlutterLogo(), themeIndex),
+            _buildOverviewCard('3', 'Streak day', 'lib/res/assets/icon_app/icStreak.png', themeIndex),
             const SizedBox(width: 16),
-            _buildOverviewCard('974', 'Starpoint', FlutterLogo(), themeIndex),
+            _buildOverviewCard('974', 'Starpoint', 'lib/res/assets/icon_app/icStar.png', themeIndex),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            _buildOverviewCard('8', 'Completed exercise', FlutterLogo(), themeIndex),
+            _buildOverviewCard('8', 'Completed exercise', 'lib/res/assets/icon_app/icCompleted.png', themeIndex),
             const SizedBox(width: 16),
-            _buildOverviewCard('862', 'Practice in minutes', FlutterLogo(), themeIndex),
+            _buildOverviewCard('862', 'Practice in minutes', 'lib/res/assets/icon_app/icPractice.png', themeIndex),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildOverviewCard(String count, String label, Widget icon, int themeIndex) {
+  Widget _buildOverviewCard(String count, String label, String iconPath, int themeIndex) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(8.0),
@@ -265,7 +280,7 @@ class ProfilePage2 extends StatelessWidget {
           children: [
             Row(
               children: [
-                icon,
+                Image.asset(iconPath, width: 24, height: 24), // Sử dụng hình ảnh tùy chỉnh
                 const SizedBox(width: 8),
                 Text(
                   count,
@@ -299,7 +314,7 @@ class ProfilePage2 extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: AppColors.getColor(themeIndex, 'messageUserBackground'),
+        color: AppColors.getColor(themeIndex, 'continueSubscriptionBackground'),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -318,7 +333,7 @@ class ProfilePage2 extends StatelessWidget {
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.getColor(themeIndex, 'headerBackground'),
+              backgroundColor: AppColors.getColor(themeIndex, 'buttonContinueSubscription'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

@@ -17,7 +17,7 @@ class NamePage extends StatelessWidget {
         title: Text(
           'NAME',
           style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
+            color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
@@ -65,8 +65,8 @@ class NamePage extends StatelessWidget {
                         : Colors.transparent,
                     border: Border.all(
                       color: index == 0
-                          ? AppColors.getColor(themeIndex, 'primaryText')
-                          : AppColors.getColor(themeIndex, 'primaryText')
+                          ? AppColors.getColor(themeIndex, 'primaryTextHeader')
+                          : AppColors.getColor(themeIndex, 'primaryTextHeader')
                           .withOpacity(0.2),
                       width: 2,
                     ),
@@ -75,7 +75,7 @@ class NamePage extends StatelessWidget {
                     child: Text(
                       (index + 1).toString(),
                       style: TextStyle(
-                        color: AppColors.getColor(themeIndex, 'primaryText'),
+                        color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                         fontSize: 16,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
@@ -156,12 +156,12 @@ class NamePage extends StatelessWidget {
               shape: BoxShape.circle,
               color: isCorrect
                   ? AppColors.getColor(themeIndex, 'cardBackground')
-                  : AppColors.getColor(themeIndex, 'messageBotBackground'),
+                  : AppColors.getColor(themeIndex, 'headerCircle2'),
               border: Border.all(
                 width: 3,
                 color: isCorrect
                     ? AppColors.getColor(themeIndex, 'headerCircle1')
-                    : AppColors.getColor(themeIndex, 'messageBotBackground'),
+                    : AppColors.getColor(themeIndex, 'headerCircle2'),
               ),
             ),
           ),
