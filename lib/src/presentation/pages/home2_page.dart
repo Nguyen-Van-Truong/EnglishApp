@@ -45,9 +45,9 @@ class Home2 extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.getColor(themeIndex, 'headerBackground'),
-            AppColors.getColor(themeIndex, 'headerCircle2'),
-            AppColors.getColor(themeIndex, 'headerBackground')
+            AppColors.getColor(themeIndex, 'headerBackgroundGradient2Home'),
+            AppColors.getColor(themeIndex, 'headerBackgroundGradient1Home'),
+            AppColors.getColor(themeIndex, 'headerBackgroundGradient2Home')
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,

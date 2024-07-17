@@ -40,31 +40,41 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildFlashcardSlider(themeIndex),
-            const SizedBox(height: 16),
-            _buildUserInfo(themeIndex),
-            const SizedBox(height: 16),
-            _buildOption('Flashcard', 'lib/res/assets/icon_app/icFlashcard.png', themeIndex),
-            const SizedBox(height: 16),
-            _buildOption('Learn', 'lib/res/assets/icon_app/icLearn.png', themeIndex),
-            const SizedBox(height: 16),
-            _buildOption('Test', 'lib/res/assets/icon_app/icTest.png', themeIndex),
-            const SizedBox(height: 16),
-            _buildTermsHeader(themeIndex),
-            const SizedBox(height: 8),
-            _buildTermCard('Word 1', 'Definition 1', themeIndex),
-            _buildTermCard('Word 2', 'Definition 2', themeIndex),
-            _buildTermCard('Word 3', 'Definition 3', themeIndex),
-            _buildTermCard('Word 4', 'Definition 4', themeIndex),
-            const SizedBox(height: 16),
-            _buildFooter(themeIndex),
-          ],
-        ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch, // Đảm bảo chiều ngang đầy đủ
+              children: [
+                _buildFlashcardSlider(themeIndex),
+                const SizedBox(height: 16),
+                _buildUserInfo(themeIndex),
+                const SizedBox(height: 16),
+                _buildOption('Flashcard', 'lib/res/assets/icon_app/icFlashcard.png', themeIndex),
+                const SizedBox(height: 16),
+                _buildOption('Learn', 'lib/res/assets/icon_app/icLearn.png', themeIndex),
+                const SizedBox(height: 16),
+                _buildOption('Test', 'lib/res/assets/icon_app/icTest.png', themeIndex),
+                const SizedBox(height: 16),
+                _buildTermsHeader(themeIndex),
+                const SizedBox(height: 8),
+                _buildTermCard('Word 1', 'Definition 1', themeIndex),
+                _buildTermCard('Word 2', 'Definition 2', themeIndex),
+                _buildTermCard('Word 3', 'Definition 3', themeIndex),
+                _buildTermCard('Word 4', 'Definition 4', themeIndex),
+                const SizedBox(height: 16),
+                SizedBox(height: 80), // Khoảng trống để footer không che nội dung
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildFooter(themeIndex),
+          ),
+        ],
       ),
     );
   }
@@ -317,29 +327,24 @@ class _VocabularyNamePageState extends State<VocabularyNamePage> {
 
   Widget _buildFooter(int themeIndex) {
     return Container(
-      margin: const EdgeInsets.only(top: 16.0),
-      width: double.infinity,
-      color: AppColors.getColor(themeIndex, 'footerBackground'),
+      color: AppColors.getColor(themeIndex, 'footerVocabularyNameBackground'),
       padding: const EdgeInsets.all(16.0),
-      child: SizedBox(
-        width: double.infinity, // Set width to fill parent
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.getColor(themeIndex, 'messageUserBackground'),
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Text(
-            'Study this set',
-            style: TextStyle(
-              color: AppColors.getColor(themeIndex, 'primaryText'),
-              fontSize: 25,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w700,
-            ),
+        ),
+        child: Text(
+          'Study this set',
+          style: TextStyle(
+            color: AppColors.getColor(themeIndex, 'primaryTextWhite'),
+            fontSize: 25,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),

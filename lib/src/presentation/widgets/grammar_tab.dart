@@ -14,6 +14,8 @@ class GrammarTab extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        Divider(color: Colors.black), // Đường kẻ ngang ngăn cách
+        const SizedBox(height: 16),
         _buildSectionContainer(
           title: 'Tense',
           children: [

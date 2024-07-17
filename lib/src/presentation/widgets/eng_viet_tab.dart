@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:englishapp/src/theme/theme_provider.dart';
+import 'package:englishapp/src/theme/colors.dart';
 
 class EngVietTab extends StatelessWidget {
   @override
@@ -10,15 +13,15 @@ class EngVietTab extends StatelessWidget {
           meaning: 'Meaning 1',
           example: 'Example 1\nTranslate example',
         ),
-        _buildAdditionalExamplesSection(),
-        _buildSmartVocabularySection(),
+        _buildAdditionalExamplesSection(context),
+        _buildSmartVocabularySection(context),
         _buildMeaningSection(
           title: 'VERB',
           meaning: 'Meaning 1',
           example: 'Example 1\nTranslate example',
         ),
-        _buildAdditionalExamplesSection(),
-        _buildSmartVocabularySection(),
+        _buildAdditionalExamplesSection(context),
+        _buildSmartVocabularySection(context),
         _buildMeaningSection(
           title: 'Adjective',
           meaning: 'Meaning 1',
@@ -86,14 +89,15 @@ class EngVietTab extends StatelessWidget {
     );
   }
 
-  Widget _buildAdditionalExamplesSection() {
+  Widget _buildAdditionalExamplesSection(BuildContext context) {
+    final themeIndex = Provider.of<ThemeProvider>(context).themeIndex;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getColor(themeIndex, 'cardBackgroundOrange'),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.black.withOpacity(0.25)),
         ),
@@ -132,14 +136,15 @@ class EngVietTab extends StatelessWidget {
     );
   }
 
-  Widget _buildSmartVocabularySection() {
+  Widget _buildSmartVocabularySection(BuildContext context) {
+    final themeIndex = Provider.of<ThemeProvider>(context).themeIndex;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getColor(themeIndex, 'cardBackgroundOrange'),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.black.withOpacity(0.25)),
         ),
