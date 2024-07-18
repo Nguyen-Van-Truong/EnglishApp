@@ -1,3 +1,4 @@
+// lib/src/presentation/pages/chatbot_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -131,7 +132,7 @@ class ChatMessagesList extends StatelessWidget {
             context,
             'There are different examples of the brain in real-life situations. One example is qualified people from developing nations being enticed by greater wages and better working conditions in nations from Western Europe, such as the U.S. They migrate from their countries to opt for such situations in the long run.',
             AppColors.getColor(themeIndex, 'messageBotBackground'),
-            Colors.white,
+            Colors.black,
             Alignment.centerLeft,
             themeIndex),
         _buildTimeText('19:58', themeIndex),
@@ -146,7 +147,7 @@ class ChatMessagesList extends StatelessWidget {
             context,
             'Chatbot reply',
             AppColors.getColor(themeIndex, 'messageBotBackground'),
-            Colors.white,
+            Colors.black,
             Alignment.centerLeft,
             themeIndex),
       ],

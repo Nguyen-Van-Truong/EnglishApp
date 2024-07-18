@@ -1,3 +1,12 @@
+import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
+import 'package:englishapp/src/presentation/pages/check_spelling_error_page.dart';
+import 'package:englishapp/src/presentation/pages/dictionary_page.dart';
+import 'package:englishapp/src/presentation/pages/exam_page.dart';
+import 'package:englishapp/src/presentation/pages/flashcard_page.dart';
+import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart';
+import 'package:englishapp/src/presentation/pages/learn_page.dart';
+import 'package:englishapp/src/presentation/pages/practice_page.dart';
+import 'package:englishapp/src/presentation/pages/virtual_speaking_room.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,14 +30,14 @@ class Home2 extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(themeIndex),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 FlashSaleSection(), // Thêm dòng này
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 SuggestionSection(), // Thêm dòng này
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _buildChatbotSection(themeIndex),
-                SizedBox(height: 16),
-                _buildMainSections(themeIndex),
+                const SizedBox(height: 16),
+                _buildMainSections(context, themeIndex),
               ],
             ),
           ),
@@ -52,7 +61,7 @@ class Home2 extends StatelessWidget {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.vertical(
+        borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(20),
         ),
       ),
@@ -73,7 +82,7 @@ class Home2 extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Username',
                   style: TextStyle(
@@ -86,7 +95,7 @@ class Home2 extends StatelessWidget {
               ],
             ),
           ),
-          Positioned(
+          const Positioned(
             left: 16,
             top: 25,
             child: CircleAvatar(
@@ -113,7 +122,7 @@ class Home2 extends StatelessWidget {
                 color: AppColors.getColor(themeIndex, 'headerCircle3'),
                 shape: BoxShape.circle,
               ),
-              child: Align(
+              child: const Align(
                 alignment: Alignment.center,
                 child: Text(
                   'Nhân vật\nChatbot',
@@ -177,7 +186,7 @@ class Home2 extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Container(
               height: 150,
               child: ListView.builder(
@@ -186,7 +195,7 @@ class Home2 extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Container(
                     width: 120,
-                    margin: EdgeInsets.only(left: 16.0, bottom: 16.0, top: 8.0),
+                    margin: const EdgeInsets.only(left: 16.0, bottom: 16.0, top: 8.0),
                     decoration: BoxDecoration(
                       color: AppColors.getColor(themeIndex, 'cardChatBot'),
                       borderRadius: BorderRadius.circular(20),
@@ -216,7 +225,7 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildMainSections(int themeIndex) {
+  Widget _buildMainSections(BuildContext context, int themeIndex) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -231,25 +240,25 @@ class Home2 extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          SizedBox(height: 8),
-          _buildCard('Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', themeIndex),
-          _buildCard('Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', themeIndex),
-          _buildCard('Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', themeIndex),
-          _buildCard('Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex),
-          _buildCard('Flashcard', 'lib/res/assets/icon_app/Flashcard.png', themeIndex),
-          _buildCard('Dictionary', 'lib/res/assets/icon_app/Dictionary.png', themeIndex),
-          _buildCard('Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', themeIndex),
+          const SizedBox(height: 8),
+          _buildCard(context, 'Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', themeIndex, GradeWritingExam()),
+          _buildCard(context, 'Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', themeIndex, const LearnPage()),
+          _buildCard(context, 'Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', themeIndex, ChatbotPage()),
+          _buildCard(context, 'Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex, CheckSpellingErrorPage()),
+          _buildCard(context, 'Flashcard', 'lib/res/assets/icon_app/Flashcard.png', themeIndex, FlashcardPage()),
+          _buildCard(context, 'Dictionary', 'lib/res/assets/icon_app/Dictionary.png', themeIndex, DictionaryPage()),
+          _buildCard(context, 'Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', themeIndex, VirtualSpeakingRoom()),
         ],
       ),
     );
   }
 
-  Widget _buildCard(String title, String iconPath, int themeIndex) {
+  Widget _buildCard(BuildContext context, String title, String iconPath, int themeIndex, Widget targetPage) {
     return Card(
       color: AppColors.getColor(themeIndex, 'cardBackground'),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.white, width: 2),
+        side: const BorderSide(color: Colors.white, width: 2),
       ),
       child: ListTile(
         title: Text(
@@ -269,9 +278,16 @@ class Home2 extends StatelessWidget {
             height: 24,
           ),
         ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => targetPage),
+          );
+        },
       ),
     );
   }
+
 
   Widget _buildChatBubbles(int themeIndex) {
     return Positioned(
@@ -281,7 +297,7 @@ class Home2 extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildTopChatBubble(themeIndex),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           _buildBottomChatBubble(themeIndex),
         ],
       ),
@@ -303,7 +319,7 @@ class Home2 extends StatelessWidget {
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 2,
             blurRadius: 4,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -319,16 +335,16 @@ class Home2 extends StatelessWidget {
             right: 6,
             top: 1,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
               height: 20,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   numberText,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontFamily: 'Poppins',
@@ -355,7 +371,7 @@ class Home2 extends StatelessWidget {
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 2,
             blurRadius: 4,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),

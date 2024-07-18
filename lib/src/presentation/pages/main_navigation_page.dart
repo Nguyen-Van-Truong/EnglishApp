@@ -1,3 +1,4 @@
+// lib/src/presentation/pages/main_navigation_page.dart
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
