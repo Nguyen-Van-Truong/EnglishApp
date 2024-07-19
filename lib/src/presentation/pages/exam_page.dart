@@ -4,6 +4,7 @@ import 'package:englishapp/src/presentation/pages/flashcard_page.dart';
 import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart';
 import 'package:englishapp/src/presentation/pages/home2_page.dart';
 import 'package:englishapp/src/presentation/pages/name_page.dart';
+import 'package:englishapp/src/presentation/pages/profile_page.dart';
 import 'package:englishapp/src/presentation/pages/profile_page2.dart';
 import 'package:englishapp/src/presentation/pages/room_setup_page.dart';
 import 'package:englishapp/src/presentation/pages/virtual_speaking_room.dart';
@@ -75,14 +76,14 @@ class ExamPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ExamCard(
-              title: 'Profile2',
+              title: 'Profile1',
               exercisesCount: 0,
               icon: Icons.chat,
               iconColor: Colors.blueAccent,
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfilePage2()),
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
               },
             ),

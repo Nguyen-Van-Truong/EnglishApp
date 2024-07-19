@@ -30,6 +30,7 @@ class AppColors {
       'headerCircle3': Color(0xFFD9D9D9),
       'headerCircle4': Color(0xFFFFE082),
       'primaryText': Colors.white,
+      'primaryTextBlack': Colors.black,
       'primaryTextHeader': Colors.white,
       'secondaryText': Colors.white70,
       'chatBubbleBackground': Colors.blue,
@@ -100,6 +101,7 @@ class AppColors {
       'chatBubbleBackground': Colors.amber,
       'footerBackground': Colors.amber,
       'footerVocabularyNameBackground': Color(0xFFFFE082),
+      'buttonFinish': Color(0xFFFFFB00),
     },
   };
 

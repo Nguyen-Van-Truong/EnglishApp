@@ -18,15 +18,18 @@ class SuggestionSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Suggestion for you',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      'Suggestion for you',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+                  SizedBox(width: 16), // Add some spacing
                   Text(
                     'Read more',
                     style: TextStyle(

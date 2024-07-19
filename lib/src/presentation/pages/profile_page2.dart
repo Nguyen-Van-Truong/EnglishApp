@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
+import 'package:englishapp/src/utils/app_localizations.dart';
 
 class ProfilePage2 extends StatelessWidget {
   @override
@@ -32,6 +33,10 @@ class ProfilePage2 extends StatelessWidget {
                   _buildSectionTitle('OVERVIEW', themeIndex),
                   const SizedBox(height: 8),
                   _buildOverview(themeIndex),
+                  const SizedBox(height: 16),
+                  _buildThemeOption(context, themeProvider, themeIndex), // Thêm dòng này
+                  const SizedBox(height: 16),
+                  _buildLanguageOption(context, themeProvider, themeIndex), // Thêm dòng này
                 ],
               ),
             ),
@@ -352,6 +357,66 @@ class ProfilePage2 extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(BuildContext context, ThemeProvider themeProvider, int themeIndex) {
+    return ListTile(
+      leading: Icon(Icons.color_lens, color: Colors.blueAccent),
+      title: Text('Change Theme', style: TextStyle(
+        color: AppColors.getColor(themeIndex, 'primaryText'),
+        fontSize: 16,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w400,
+      )),
+      trailing: DropdownButton<int>(
+        value: themeProvider.themeIndex,
+        onChanged: (int? newThemeIndex) {
+          if (newThemeIndex != null) {
+            themeProvider.setTheme(newThemeIndex);
+          }
+        },
+        items: [
+          DropdownMenuItem(
+            value: 0,
+            child: Text('Purple Theme'),
+          ),
+          DropdownMenuItem(
+            value: 1,
+            child: Text('Pink Theme'),
+          ),
+          DropdownMenuItem(
+            value: 2,
+            child: Text('Yellow Theme'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(BuildContext context, ThemeProvider themeProvider, int themeIndex) {
+    return ListTile(
+      leading: Icon(Icons.language, color: Colors.blueAccent),
+      title: Text('Change Language', style: TextStyle(
+        color: AppColors.getColor(themeIndex, 'primaryText'),
+        fontSize: 16,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w400,
+      )),
+      trailing: DropdownButton<Locale>(
+        value: themeProvider.locale,
+        onChanged: (Locale? newLocale) {
+          if (newLocale != null) {
+            themeProvider.setLocale(newLocale);
+          }
+        },
+        items: AppLocalizations.supportedLocales.map<DropdownMenuItem<Locale>>((Locale locale) {
+          return DropdownMenuItem<Locale>(
+            value: locale,
+            child: Text(locale.languageCode == 'en' ? 'English' : 'Tiếng Việt'),
+          );
+        }).toList(),
       ),
     );
   }

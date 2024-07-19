@@ -244,7 +244,7 @@ class Home2 extends StatelessWidget {
           _buildCard(context, 'Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', themeIndex, GradeWritingExam()),
           _buildCard(context, 'Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', themeIndex, const LearnPage()),
           _buildCard(context, 'Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', themeIndex, ChatbotPage()),
-          _buildCard(context, 'Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex, CheckSpellingErrorPage()),
+          _buildCard(context, 'Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex, Home2()),
           _buildCard(context, 'Flashcard', 'lib/res/assets/icon_app/Flashcard.png', themeIndex, FlashcardPage()),
           _buildCard(context, 'Dictionary', 'lib/res/assets/icon_app/Dictionary.png', themeIndex, DictionaryPage()),
           _buildCard(context, 'Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', themeIndex, VirtualSpeakingRoom()),

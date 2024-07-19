@@ -23,6 +23,9 @@ dependencies:
   camera: ^0.11.0+1
   flutter_webrtc: ^0.11.1
   image_cropper: ^7.1.0
+  flutter_widget_from_html: ^0.15.1
+  flutter_quill: ^10.0.0
+  google_ml_kit: ^0.7.0
 
 dev_dependencies:
   flutter_test:

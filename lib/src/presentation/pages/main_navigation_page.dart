@@ -1,4 +1,5 @@
 // lib/src/presentation/pages/main_navigation_page.dart
+import 'package:englishapp/src/presentation/pages/profile_page2.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     PracticePage(),
     ExamPage(),
     ChatbotPage(),
-    ProfilePage(),
+    ProfilePage2(),
   ];
 
   void _onItemTapped(int index) {
