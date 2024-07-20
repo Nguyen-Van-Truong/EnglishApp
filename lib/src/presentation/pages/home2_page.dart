@@ -11,6 +11,7 @@ import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:englishapp/src/utils/app_localizations.dart';
 
 import '../widgets/flash_sale_section.dart';
 import '../widgets/suggestion_section.dart';
@@ -20,6 +21,7 @@ class Home2 extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final themeIndex = themeProvider.themeIndex;
+    final localization = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
@@ -29,15 +31,15 @@ class Home2 extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(themeIndex),
+                _buildHeader(themeIndex, localization),
                 const SizedBox(height: 16),
-                FlashSaleSection(), // Thêm dòng này
+                FlashSaleSection(),
                 const SizedBox(height: 16),
-                SuggestionSection(), // Thêm dòng này
+                SuggestionSection(),
                 const SizedBox(height: 16),
-                _buildChatbotSection(themeIndex),
+                _buildChatbotSection(themeIndex, localization),
                 const SizedBox(height: 16),
-                _buildMainSections(context, themeIndex),
+                _buildMainSections(context, themeIndex, localization),
               ],
             ),
           ),
@@ -47,7 +49,7 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(int themeIndex) {
+  Widget _buildHeader(int themeIndex, AppLocalizations? localization) {
     return Container(
       width: double.infinity,
       height: 200,
@@ -74,7 +76,7 @@ class Home2 extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back,',
+                  localization?.translate('welcome_back') ?? 'Welcome back,',
                   style: TextStyle(
                     color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                     fontSize: 13,
@@ -84,7 +86,7 @@ class Home2 extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Username',
+                  localization?.translate('username') ?? 'Username',
                   style: TextStyle(
                     color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                     fontSize: 24,
@@ -122,10 +124,10 @@ class Home2 extends StatelessWidget {
                 color: AppColors.getColor(themeIndex, 'headerCircle3'),
                 shape: BoxShape.circle,
               ),
-              child: const Align(
+              child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Nhân vật\nChatbot',
+                  localization?.translate('chatbot_character') ?? 'Chatbot Character',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
@@ -142,7 +144,7 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildChatbotSection(int themeIndex) {
+  Widget _buildChatbotSection(int themeIndex, AppLocalizations? localization) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: Container(
@@ -160,7 +162,7 @@ class Home2 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'IMTA ChatBot',
+                    localization?.translate('imta_chatbot') ?? 'IMTA ChatBot',
                     style: TextStyle(
                       color: AppColors.getColor(themeIndex, 'primaryText'),
                       fontSize: 20,
@@ -173,7 +175,7 @@ class Home2 extends StatelessWidget {
                       // Add your onTap logic here
                     },
                     child: Text(
-                      'View History',
+                      localization?.translate('view_history') ?? 'View History',
                       style: TextStyle(
                         color: AppColors.getColor(themeIndex, 'primaryText'),
                         fontSize: 12,
@@ -200,7 +202,6 @@ class Home2 extends StatelessWidget {
                       color: AppColors.getColor(themeIndex, 'cardChatBot'),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: AppColors.getColor(themeIndex, 'border')),
-
                     ),
                     child: Center(
                       child: index == 0
@@ -225,14 +226,14 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildMainSections(BuildContext context, int themeIndex) {
+  Widget _buildMainSections(BuildContext context, int themeIndex, AppLocalizations? localization) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'What should we do today?',
+            localization?.translate('what_should_we_do_today') ?? 'What should we do today?',
             style: TextStyle(
               color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 20,
@@ -241,13 +242,13 @@ class Home2 extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _buildCard(context, 'Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', themeIndex, GradeWritingExam()),
-          _buildCard(context, 'Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', themeIndex, const LearnPage()),
-          _buildCard(context, 'Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', themeIndex, ChatbotPage()),
-          _buildCard(context, 'Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex, Home2()),
-          _buildCard(context, 'Flashcard', 'lib/res/assets/icon_app/Flashcard.png', themeIndex, FlashcardPage()),
-          _buildCard(context, 'Dictionary', 'lib/res/assets/icon_app/Dictionary.png', themeIndex, DictionaryPage()),
-          _buildCard(context, 'Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', themeIndex, VirtualSpeakingRoom()),
+          _buildCard(context, localization?.translate('grade_writing_exam') ?? 'Grade Writing Exam', 'lib/res/assets/icon_app/icon_Grade_Writing_Exam.png', themeIndex, GradeWritingExam()),
+          _buildCard(context, localization?.translate('study_by_topic') ?? 'Study by Topic', 'lib/res/assets/icon_app/Study_by_Topic.png', themeIndex, const LearnPage()),
+          _buildCard(context, localization?.translate('solve_exercise') ?? 'Solve Exercise', 'lib/res/assets/icon_app/Solve_Exercise.png', themeIndex, ChatbotPage()),
+          _buildCard(context, localization?.translate('check_spelling_error') ?? 'Check Spelling Error', 'lib/res/assets/icon_app/Check_Spelling_Error.png', themeIndex, CheckSpellingErrorPage()),
+          _buildCard(context, localization?.translate('flashcard') ?? 'Flashcard', 'lib/res/assets/icon_app/Flashcard.png', themeIndex, FlashcardPage()),
+          _buildCard(context, localization?.translate('dictionary') ?? 'Dictionary', 'lib/res/assets/icon_app/Dictionary.png', themeIndex, DictionaryPage()),
+          _buildCard(context, localization?.translate('virtual_speaking_room') ?? 'Virtual Speaking Room', 'lib/res/assets/icon_app/Virtual_Speaking_Room.png', themeIndex, VirtualSpeakingRoom()),
         ],
       ),
     );
@@ -287,7 +288,6 @@ class Home2 extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildChatBubbles(int themeIndex) {
     return Positioned(

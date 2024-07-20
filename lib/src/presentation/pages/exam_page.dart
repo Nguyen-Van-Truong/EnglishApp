@@ -5,7 +5,6 @@ import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart'
 import 'package:englishapp/src/presentation/pages/home2_page.dart';
 import 'package:englishapp/src/presentation/pages/name_page.dart';
 import 'package:englishapp/src/presentation/pages/profile_page.dart';
-import 'package:englishapp/src/presentation/pages/profile_page2.dart';
 import 'package:englishapp/src/presentation/pages/room_setup_page.dart';
 import 'package:englishapp/src/presentation/pages/virtual_speaking_room.dart';
 import 'package:englishapp/src/presentation/pages/vocabulary_list_page.dart';
@@ -83,7 +82,7 @@ class ExamPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
               },
             ),
