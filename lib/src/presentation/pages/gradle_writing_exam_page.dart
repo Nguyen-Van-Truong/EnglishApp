@@ -495,68 +495,59 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
     );
   }
 
-  Widget _buildRichTextWithErrors(
-      String text, List<ErrorDetail> errors, int themeIndex) {
+  Widget _buildRichTextWithErrors(String text, List<ErrorDetail> errors, int themeIndex) {
     List<TextSpan> spans = [];
-    int lastMatchEnd = 0;
 
-    for (final error in errors) {
-      final startIndex = text.indexOf(error.highlight, lastMatchEnd);
-      if (startIndex == -1) continue;
+    // Tách câu ra khỏi đoạn văn
+    List<String> sentences = text.split(RegExp(r'(?<=[.!?])\s+'));
 
-      final endIndex = startIndex + error.highlight.length;
+    for (String sentence in sentences) {
+      bool isSentenceError = false;
+      List<TextSpan> sentenceSpans = [];
 
-      if (startIndex > lastMatchEnd) {
-        spans.add(TextSpan(text: text.substring(lastMatchEnd, startIndex)));
+      // Kiểm tra xem câu có bị lỗi không
+      for (final error in errors) {
+        if (sentence.contains(error.highlight) && error.issues.any((issue) => issue.type == 'sentence')) {
+          isSentenceError = true;
+          break;
+        }
       }
 
-      List<TextSpan> innerSpans = [];
-      int innerLastMatchEnd = 0;
+      // Nếu câu bị lỗi, tách từ trong câu ra
+      List<String> words = sentence.split(' ');
+      for (String word in words) {
+        bool isWordError = false;
 
-      for (final issue in error.issues) {
-        final innerStartIndex = error.highlight.indexOf(issue.issue, innerLastMatchEnd);
-        if (innerStartIndex == -1) continue;
-
-        final innerEndIndex = innerStartIndex + issue.issue.length;
-
-        if (innerStartIndex > innerLastMatchEnd) {
-          innerSpans.add(TextSpan(
-              text: error.highlight.substring(innerLastMatchEnd, innerStartIndex)));
+        for (final error in errors) {
+          if (word.contains(error.highlight) && error.issues.any((issue) => issue.type == 'word')) {
+            isWordError = true;
+            sentenceSpans.add(TextSpan(
+              text: word,
+              style: TextStyle(
+                color: Colors.red,
+                decoration: TextDecoration.underline,
+                decorationColor: Colors.red,
+              ),
+            ));
+            break;
+          }
         }
 
-        innerSpans.add(TextSpan(
-          text: issue.issue,
-          style: TextStyle(
-            color: Colors.red,
-            decoration: TextDecoration.underline,
-            decorationColor: Colors.red,
-          ),
-        ));
+        if (!isWordError) {
+          sentenceSpans.add(TextSpan(
+            text: word,
+            style: TextStyle(
+              backgroundColor: isSentenceError ? Colors.yellow.withOpacity(0.3) : Colors.transparent,
+              decoration: TextDecoration.underline,
+              decorationColor: Color(0xFFFFEA00),
+            ),
+          ));
+        }
 
-        innerLastMatchEnd = innerEndIndex;
+        sentenceSpans.add(TextSpan(text: ' '));
       }
 
-      if (innerLastMatchEnd < error.highlight.length) {
-        innerSpans.add(TextSpan(text: error.highlight.substring(innerLastMatchEnd)));
-      }
-
-      spans.add(TextSpan(
-        children: innerSpans,
-        style: TextStyle(
-          backgroundColor: error.issues.any((issue) => issue.type == 'sentence')
-              ? Colors.yellow.withOpacity(0.3)
-              : Colors.transparent,
-          color: error.issues.any((issue) => issue.type == 'word')
-              ? Colors.red
-              : Colors.black,
-        ),
-      ));
-
-      lastMatchEnd = endIndex;
-    }
-
-    if (lastMatchEnd < text.length) {
-      spans.add(TextSpan(text: text.substring(lastMatchEnd)));
+      spans.add(TextSpan(children: sentenceSpans));
     }
 
     return RichText(
