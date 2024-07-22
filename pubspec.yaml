@@ -26,6 +26,7 @@ dependencies:
   flutter_widget_from_html: ^0.15.1
   flutter_quill: ^10.0.0
   google_ml_kit: ^0.7.0
+  flutter_html: ^3.0.0-beta.2
 
 dev_dependencies:
   flutter_test:

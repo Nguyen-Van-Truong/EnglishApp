@@ -85,7 +85,7 @@ class _CreateEssayPageState extends State<CreateEssayPage> {
                     MaterialPageRoute(
                       builder: (context) => GradeWritingExam(
                         topic: _topicController.text,
-                        content: _contentController.text.replaceAll("(_)", "___"),
+                        content: _contentController.text,
                       ),
                     ),
                   );
@@ -140,7 +140,7 @@ class _CreateEssayPageState extends State<CreateEssayPage> {
             ),
           ),
           const SizedBox(height: 8),
-          TextField(
+          TextFormField(
             controller: controller,
             maxLines: null,
             decoration: InputDecoration(

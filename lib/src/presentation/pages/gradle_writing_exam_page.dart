@@ -1,4 +1,4 @@
-// lib/src/presentation/pages/gradle_writing_exam_page.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
@@ -8,26 +8,107 @@ import 'package:englishapp/src/presentation/pages/create_essay_page.dart';
 
 class GradeWritingExam extends StatefulWidget {
   final String? topic;
-  final String? content;
+  String? content;
 
-  GradeWritingExam({this.topic, this.content});
+  GradeWritingExam({
+    String? topic,
+    String? content,
+  })  : topic = topic ??
+      'Some people believe that in a city, the best way to travel is by car, while other people argue that bicycles are a better way of travelling in a city. Discuss both views and give your opinion.',
+        content = content ??
+            """
+         In today's urban landscapes, the choice of transportation mode sparks considerable debate between proponents of cars and bicycles. While some advocate for the convenience and comfort of cars in navigating the city streets, others emphasize the environmental and health benefits of cycling. In this essay, I will examine both perspectives, weighing the pros and cons of each mode of transportation before presenting my own reasoned opinion.
+       """;
 
   @override
   _GradeWritingExamState createState() => _GradeWritingExamState();
 }
 
 class _GradeWritingExamState extends State<GradeWritingExam> {
-  final EssayEvaluationService essayEvaluationService = EssayEvaluationService(baseUrl: 'http://35.184.119.129:8550');
-  late Future<Map<String, dynamic>> evaluationResult;
+  final EssayEvaluationService essayEvaluationService =
+  EssayEvaluationService(baseUrl: 'http://35.184.119.129:8550');
+  Future<Map<String, dynamic>>? evaluationResult;
+  List<ErrorDetail> errors = [];
+  bool isLoading = false;
+  final TextEditingController _essayContentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    evaluationResult = essayEvaluationService.evaluateEssay(
-      'random id',
-      'write an essay ....',
-      'in this essay, I will talk ...',
-    );
+    _essayContentController.text = widget.content!;
+  }
+
+  void _submitEssay() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final topic =
+          "Some people believe that in a city, the best way to travel is by car, while other people argue that bicycles are a better way of travelling in a city. Discuss both views and give your opinion.";
+      final content =
+          "In today's urban landscapes, the choice of transportation mode sparks considerable debate between proponents of cars and bicycles. While some advocate for the convenience and comfort of cars in navigating the city streets, others emphasize the environmental and health benefits of cycling. In this essay, I will examine both perspectives, weighing the pros and cons of each mode of transportation before presenting my own reasoned opinion.";
+
+      final response = await essayEvaluationService.generateErrors(
+        'string',
+        topic,
+        content,
+      );
+
+      if (response == null || response.isEmpty) {
+        throw Exception('No errors returned from the service');
+      }
+
+      setState(() {
+        errors = parseErrors(response['display_errors']['bad_parts']);
+        _printHighlightedErrors(errors);
+      });
+
+      final evaluation = await essayEvaluationService.evaluateEssay(
+        'random id',
+        topic,
+        content,
+      );
+
+      setState(() {
+        evaluationResult = Future.value(evaluation);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        evaluationResult = Future.error(e);
+        isLoading = false;
+      });
+    }
+  }
+
+  List<ErrorDetail> parseErrors(List<dynamic> errorParts) {
+    return errorParts.map((part) {
+      return ErrorDetail(
+        id: part['id'],
+        highlight: part['highlight'],
+        issues: (part['details'] as List<dynamic>).map((detail) {
+          return Issue(
+            issue: detail['issue'],
+            seriousLevel: detail['serious_level'],
+            idea: detail['idea'],
+            type: detail['type'],
+          );
+        }).toList(),
+      );
+    }).toList();
+  }
+
+  void _printHighlightedErrors(List<ErrorDetail> errors) {
+    for (var error in errors) {
+      for (var issue in error.issues) {
+        if (issue.type == 'sentence') {
+          debugPrint('Highlighted Sentence (Yellow): ${error.highlight}');
+        } else if (issue.type == 'word') {
+          debugPrint('Highlighted Word (Red): ${error.highlight}');
+        }
+      }
+    }
   }
 
   @override
@@ -57,7 +138,7 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CreateEssayPage(),
@@ -67,30 +148,120 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
           ),
         ],
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: evaluationResult,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final data = snapshot.data!;
-            return SingleChildScrollView(
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   _buildEssayTopicSection(themeIndex),
                   const SizedBox(height: 0),
-                  _buildScoreSection(themeIndex, data),
-                  const SizedBox(height: 0),
-                  _buildEssayContentSection(themeIndex),
+                  FutureBuilder<Map<String, dynamic>>(
+                    future: evaluationResult,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          isLoading) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (snapshot.hasData) {
+                        final data = snapshot.data!;
+                        return Column(
+                          children: [
+                            _buildScoreSection(themeIndex, data),
+                            const SizedBox(height: 0),
+                            _buildHighlightedEssaySection(themeIndex),
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            _buildScoreSectionPlaceholder(themeIndex),
+                            const SizedBox(height: 0),
+                            _buildEssayContentSection(themeIndex),
+                          ],
+                        );
+                      }
+                    },
+                  ),
                 ],
               ),
-            );
-          } else {
-            return Center(child: Text('No data found'));
-          }
-        },
+            ),
+          ),
+          ElevatedButton(
+            onPressed: _submitEssay,
+            child: isLoading
+                ? CircularProgressIndicator(color: Colors.white)
+                : Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreSectionPlaceholder(int themeIndex) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color:
+              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 40.0),
+                      child: Text(
+                        '--',
+                        style: TextStyle(
+                          color: AppColors.getColor(themeIndex, 'headerCircle1'),
+                          fontSize: 60,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50.0),
+                      child: Text(
+                        'Overall Band Score',
+                        style: TextStyle(
+                          color: AppColors.getColor(themeIndex, 'primaryText'),
+                          fontSize: 10,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 50.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildScoreItem('Coherence & Cohesion: --', themeIndex),
+                        _buildScoreItem('Lexical Resources: --', themeIndex),
+                        _buildScoreItem('Grammatical range: --', themeIndex),
+                        _buildScoreItem('Task Achievement: --', themeIndex),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -108,7 +279,9 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+          border: Border.all(
+              color:
+              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -152,10 +325,17 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildScoreItem('Coherence & Cohesion: $coherenceScore', themeIndex),
-                        _buildScoreItem('Lexical Resources: $lexicalResourcesScore', themeIndex),
-                        _buildScoreItem('Grammatical range: $grammaticalRangeScore', themeIndex),
-                        _buildScoreItem('Task Achievement: $taskAchievementScore', themeIndex),
+                        _buildScoreItem('Coherence & Cohesion: $coherenceScore',
+                            themeIndex),
+                        _buildScoreItem(
+                            'Lexical Resources: $lexicalResourcesScore',
+                            themeIndex),
+                        _buildScoreItem(
+                            'Grammatical range: $grammaticalRangeScore',
+                            themeIndex),
+                        _buildScoreItem(
+                            'Task Achievement: $taskAchievementScore',
+                            themeIndex),
                       ],
                     ),
                   ),
@@ -173,7 +353,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Icon(Icons.circle, size: 6, color: AppColors.getColor(themeIndex, 'primaryText')),
+          Icon(Icons.circle,
+              size: 6, color: AppColors.getColor(themeIndex, 'primaryText')),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -196,7 +377,9 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+          border: Border.all(
+              color:
+              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -214,7 +397,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
             ),
             const SizedBox(height: 8),
             Text(
-              widget.topic ?? 'Chưa có đề bài',
+              widget.topic ??
+                  'Some people believe that in a city, the best way to travel is by car, while other people argue that bicycles are a better way of travelling in a city. Discuss both views and give your opinion.',
               textAlign: TextAlign.justify,
               style: TextStyle(
                 color: AppColors.getColor(themeIndex, 'primaryText'),
@@ -230,50 +414,13 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
   }
 
   Widget _buildEssayContentSection(int themeIndex) {
-    final essayContent = widget.content ?? """
-      In the modern-day society, professional <span style="text-decoration:underline; color:red">sportsman</span> get a big salary <span style="text-decoration:underline; color:red">compare</span> with <span style="text-decoration:underline; color:red">others</span> people who are related to <span style="text-decoration:underline; color:red">another significant jobs</span>. Some individuals think that it has a positive impact, however others believe that it has a negative one. This essay believes that good sportsman are supposed to earn more due to the fact that their life is in <span style="text-decoration:underline; color:red">a</span> danger. 
-      On the one hand, there are numerous people who think that everyone has to get <span style="text-decoration:underline; color:red">the</span> equal salary and it is unfair to someone receives more. Good workers are <span style="text-decoration:underline; color:red">consider</span> to have tremendous money due to the fact that they have a higher position in a company. Also, there are professions connected with <span style="text-decoration:underline; color:red">IT</span> sphere where people can develop and earn more. According to some survey, people who work in such companies complain that they get fewer than those who participate in <span style="text-decoration:underline; color:red">a professional competitions</span>. This essay argues that individuals who have a good job cannot have salary bigger than sportsman due to the fact that they <span style="text-decoration:underline; color:red">always</span> at <span style="text-decoration:underline; color:red">a</span> risk to be injured.
-      However, some people are aware of the fact that sportsman work hard to achieve their goals that are related to the fact that they have a desire to win a competition and get a reward. In addition, they have some challenges in their career that is connected with depression or some accidents. That is why people consider their salary to be higher. According to some research, approximately 60% of respondents share that they <span style="text-decoration:underline; color:red">satisfied</span> with their budget.
-      In conclusion, currently, there are a large number of people who believe that sportsman deserve to get a big salary due to the fact that they work hard and for our pleasure and fun.
-      """;
-
-    final parts = essayContent.split('___');
-    final spans = <InlineSpan>[];
-
-    for (int i = 0; i < parts.length; i++) {
-      spans.add(TextSpan(text: parts[i]));
-      if (i < parts.length - 1) {
-        spans.add(WidgetSpan(
-          child: Container(
-            width: 50,
-            child: TextField(
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 2),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-              ),
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-        ));
-      }
-    }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+          border: Border.all(
+              color:
+              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -290,15 +437,24 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
               ),
             ),
             const SizedBox(height: 8),
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: AppColors.getColor(themeIndex, 'primaryText'),
-                  fontSize: 11,
+            TextFormField(
+              controller: _essayContentController,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Nhập nội dung bài làm tại đây...',
+                hintStyle: TextStyle(
+                  color: AppColors.getColor(themeIndex, 'secondaryText'),
+                  fontSize: 12,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,
                 ),
-                children: spans,
+              ),
+              style: TextStyle(
+                color: AppColors.getColor(themeIndex, 'primaryText'),
+                fontSize: 12,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
@@ -306,4 +462,140 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       ),
     );
   }
+
+  Widget _buildHighlightedEssaySection(int themeIndex) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color:
+              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bài làm được đánh dấu',
+              style: TextStyle(
+                color: AppColors.getColor(themeIndex, 'primaryText'),
+                fontSize: 14,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildRichTextWithErrors(
+                _essayContentController.text, errors, themeIndex),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRichTextWithErrors(
+      String text, List<ErrorDetail> errors, int themeIndex) {
+    List<TextSpan> spans = [];
+    int lastMatchEnd = 0;
+
+    for (final error in errors) {
+      final startIndex = text.indexOf(error.highlight, lastMatchEnd);
+      if (startIndex == -1) continue;
+
+      final endIndex = startIndex + error.highlight.length;
+
+      if (startIndex > lastMatchEnd) {
+        spans.add(TextSpan(text: text.substring(lastMatchEnd, startIndex)));
+      }
+
+      List<TextSpan> innerSpans = [];
+      int innerLastMatchEnd = 0;
+
+      for (final issue in error.issues) {
+        final innerStartIndex = error.highlight.indexOf(issue.issue, innerLastMatchEnd);
+        if (innerStartIndex == -1) continue;
+
+        final innerEndIndex = innerStartIndex + issue.issue.length;
+
+        if (innerStartIndex > innerLastMatchEnd) {
+          innerSpans.add(TextSpan(
+              text: error.highlight.substring(innerLastMatchEnd, innerStartIndex)));
+        }
+
+        innerSpans.add(TextSpan(
+          text: issue.issue,
+          style: TextStyle(
+            color: Colors.red,
+            decoration: TextDecoration.underline,
+            decorationColor: Colors.red,
+          ),
+        ));
+
+        innerLastMatchEnd = innerEndIndex;
+      }
+
+      if (innerLastMatchEnd < error.highlight.length) {
+        innerSpans.add(TextSpan(text: error.highlight.substring(innerLastMatchEnd)));
+      }
+
+      spans.add(TextSpan(
+        children: innerSpans,
+        style: TextStyle(
+          backgroundColor: error.issues.any((issue) => issue.type == 'sentence')
+              ? Colors.yellow.withOpacity(0.3)
+              : Colors.transparent,
+          color: error.issues.any((issue) => issue.type == 'word')
+              ? Colors.red
+              : Colors.black,
+        ),
+      ));
+
+      lastMatchEnd = endIndex;
+    }
+
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastMatchEnd)));
+    }
+
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          color: AppColors.getColor(themeIndex, 'primaryText'),
+          fontSize: 12,
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w400,
+        ),
+        children: spans,
+      ),
+    );
+  }
+
+}
+
+class ErrorDetail {
+  final int id;
+  final String highlight;
+  final List<Issue> issues;
+
+  ErrorDetail({
+    required this.id,
+    required this.highlight,
+    required this.issues,
+  });
+}
+
+class Issue {
+  final String issue;
+  final int seriousLevel;
+  final String idea;
+  final String type;
+
+  Issue({
+    required this.issue,
+    required this.seriousLevel,
+    required this.idea,
+    required this.type,
+  });
 }
