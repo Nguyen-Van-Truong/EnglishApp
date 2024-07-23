@@ -155,7 +155,7 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
               child: Column(
                 children: [
                   _buildEssayTopicSection(themeIndex),
-                  const SizedBox(height: 0),
+                  const SizedBox(height: 16),
                   FutureBuilder<Map<String, dynamic>>(
                     future: evaluationResult,
                     builder: (context, snapshot) {
@@ -169,15 +169,17 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
                         return Column(
                           children: [
                             _buildScoreSection(themeIndex, data),
-                            const SizedBox(height: 0),
+                            const SizedBox(height: 16),
                             _buildHighlightedEssaySection(themeIndex),
+                            const SizedBox(height: 16),
+                            _buildErrorListSection(themeIndex, errors),
                           ],
                         );
                       } else {
                         return Column(
                           children: [
                             _buildScoreSectionPlaceholder(themeIndex),
-                            const SizedBox(height: 0),
+                            const SizedBox(height: 16),
                             _buildEssayContentSection(themeIndex),
                           ],
                         );
@@ -205,8 +207,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -280,8 +282,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -325,17 +327,10 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildScoreItem('Coherence & Cohesion: $coherenceScore',
-                            themeIndex),
-                        _buildScoreItem(
-                            'Lexical Resources: $lexicalResourcesScore',
-                            themeIndex),
-                        _buildScoreItem(
-                            'Grammatical range: $grammaticalRangeScore',
-                            themeIndex),
-                        _buildScoreItem(
-                            'Task Achievement: $taskAchievementScore',
-                            themeIndex),
+                        _buildScoreItem('Coherence & Cohesion: $coherenceScore', themeIndex),
+                        _buildScoreItem('Lexical Resources: $lexicalResourcesScore', themeIndex),
+                        _buildScoreItem('Grammatical range: $grammaticalRangeScore', themeIndex),
+                        _buildScoreItem('Task Achievement: $taskAchievementScore', themeIndex),
                       ],
                     ),
                   ),
@@ -353,8 +348,7 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Icon(Icons.circle,
-              size: 6, color: AppColors.getColor(themeIndex, 'primaryText')),
+          Icon(Icons.circle, size: 6, color: AppColors.getColor(themeIndex, 'primaryText')),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -378,8 +372,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -419,8 +413,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -469,8 +463,8 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-              AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -495,59 +489,74 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
     );
   }
 
-  Widget _buildRichTextWithErrors(String text, List<ErrorDetail> errors, int themeIndex) {
+  Widget _buildRichTextWithErrors(
+      String text, List<ErrorDetail> errors, int themeIndex) {
     List<TextSpan> spans = [];
+    int lastMatchEnd = 0;
 
-    // Tách câu ra khỏi đoạn văn
-    List<String> sentences = text.split(RegExp(r'(?<=[.!?])\s+'));
+    for (final error in errors) {
+      final startIndex = text.indexOf(error.highlight, lastMatchEnd);
+      if (startIndex == -1) continue;
 
-    for (String sentence in sentences) {
-      bool isSentenceError = false;
-      List<TextSpan> sentenceSpans = [];
+      final endIndex = startIndex + error.highlight.length;
 
-      // Kiểm tra xem câu có bị lỗi không
-      for (final error in errors) {
-        if (sentence.contains(error.highlight) && error.issues.any((issue) => issue.type == 'sentence')) {
-          isSentenceError = true;
-          break;
-        }
+      if (startIndex > lastMatchEnd) {
+        spans.add(TextSpan(text: text.substring(lastMatchEnd, startIndex)));
       }
 
-      // Nếu câu bị lỗi, tách từ trong câu ra
-      List<String> words = sentence.split(' ');
-      for (String word in words) {
-        bool isWordError = false;
+      List<TextSpan> innerSpans = [];
+      int innerLastMatchEnd = 0;
 
-        for (final error in errors) {
-          if (word.contains(error.highlight) && error.issues.any((issue) => issue.type == 'word')) {
-            isWordError = true;
-            sentenceSpans.add(TextSpan(
-              text: word,
-              style: TextStyle(
-                color: Colors.red,
-                decoration: TextDecoration.underline,
-                decorationColor: Colors.red,
-              ),
-            ));
-            break;
-          }
+      for (final issue in error.issues) {
+        final innerStartIndex = error.highlight.indexOf(issue.issue, innerLastMatchEnd);
+        if (innerStartIndex == -1) continue;
+
+        final innerEndIndex = innerStartIndex + issue.issue.length;
+
+        if (innerStartIndex > innerLastMatchEnd) {
+          innerSpans.add(TextSpan(
+              text: error.highlight.substring(innerLastMatchEnd, innerStartIndex)));
         }
 
-        if (!isWordError) {
-          sentenceSpans.add(TextSpan(
-            text: word,
-            style: TextStyle(
-              backgroundColor: isSentenceError ? Colors.yellow.withOpacity(0.3) : Colors.transparent,
-              decoration: TextDecoration.underline,
-              decorationColor: Color(0xFFFFEA00),
-            ),
-          ));
-        }
+        innerSpans.add(TextSpan(
+          text: issue.issue,
+          style: TextStyle(
+            color: Colors.red,
+            decoration: TextDecoration.underline,
+            decorationColor: Colors.red,
+          ),
+        ));
 
-        sentenceSpans.add(TextSpan(text: ' '));
+        innerLastMatchEnd = innerEndIndex;
       }
 
-      spans.add(TextSpan(children: sentenceSpans));
+      if (innerLastMatchEnd < error.highlight.length) {
+        innerSpans.add(TextSpan(text: error.highlight.substring(innerLastMatchEnd)));
+      }
+
+      spans.add(TextSpan(
+        children: innerSpans,
+        style: TextStyle(
+          backgroundColor: error.issues.any((issue) => issue.type == 'sentence')
+              ? Colors.yellow.withOpacity(0.3)
+              : Colors.transparent,
+          color: error.issues.any((issue) => issue.type == 'word')
+              ? Colors.red
+              : Colors.black,
+          decoration: error.issues.any((issue) => issue.type == 'sentence')
+              ? TextDecoration.underline
+              : TextDecoration.none,
+          decorationColor: error.issues.any((issue) => issue.type == 'sentence')
+              ? Colors.yellow
+              : Colors.transparent,
+        ),
+      ));
+
+      lastMatchEnd = endIndex;
+    }
+
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastMatchEnd)));
     }
 
     return RichText(
@@ -563,6 +572,114 @@ class _GradeWritingExamState extends State<GradeWritingExam> {
     );
   }
 
+  Widget _buildErrorListSection(int themeIndex, List<ErrorDetail> errors) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Danh sách lỗi từ',
+              style: TextStyle(
+                color: AppColors.getColor(themeIndex, 'primaryText'),
+                fontSize: 14,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: errors.length,
+              itemBuilder: (context, index) {
+                final error = errors[index];
+                return ExpansionTile(
+                  title: Text(
+                    'Lỗi từ #${error.id}',
+                    style: TextStyle(
+                      color: AppColors.getColor(themeIndex, 'primaryText'),
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  children: error.issues.map((issue) {
+                    return ListTile(
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              issue.issue,
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildSeriousLevelIndicator(issue.seriousLevel),
+                        ],
+                      ),
+                      subtitle: Text(
+                        'Idea: ${issue.idea}',
+                        style: TextStyle(
+                          color: AppColors.getColor(themeIndex, 'primaryText'),
+                          fontSize: 12,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSeriousLevelIndicator(int seriousLevel) {
+    Color getColor(int level) {
+      switch (level) {
+        case 1:
+          return Colors.blue;
+        case 2:
+          return Colors.green;
+        case 3:
+          return Colors.yellow;
+        case 4:
+          return Colors.orange;
+        case 5:
+          return Colors.red;
+        default:
+          return Colors.grey;
+      }
+    }
+
+    return Row(
+      children: List.generate(seriousLevel, (index) {
+        return Container(
+          width: 10,
+          height: 10,
+          color: getColor(seriousLevel),
+          margin: EdgeInsets.symmetric(horizontal: 1),
+        );
+      }),
+    );
+  }
 }
 
 class ErrorDetail {
