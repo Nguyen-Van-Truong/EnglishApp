@@ -1,21 +1,111 @@
 // lib/src/presentation/pages/chatbot_page.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
+import 'package:englishapp/src/services/chatbot_service.dart';
 
-class ChatbotPage extends StatelessWidget {
+class ChatbotPage extends StatefulWidget {
+  @override
+  _ChatbotPageState createState() => _ChatbotPageState();
+}
+
+class _ChatbotPageState extends State<ChatbotPage> {
   final ImagePicker _picker = ImagePicker();
+  final ChatbotService chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580');
+  final TextEditingController _textController = TextEditingController();
+  List<Map<String, dynamic>> messages = [];
+  String currentMessage = "";
+
+  @override
+  void initState() {
+    super.initState();
+    chatbotService.listenToSSE(_handleSSEEvent);
+  }
+
+  @override
+  void dispose() {
+    chatbotService.dispose();
+    super.dispose();
+  }
+
+  void _handleSSEEvent(String event) {
+    setState(() {
+      if (messages.isEmpty || messages.last['isUser']) {
+        messages.add({
+          'message': '',
+          'isUser': false,
+          'time': _getCurrentTime()
+        });
+      }
+      messages.last['message'] += event.trim();
+    });
+    print('Output: $currentMessage');
+  }
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image selected: ${pickedFile.path}')),
-      );
+      File? croppedFile = await _cropImage(pickedFile.path);
+      if (croppedFile != null) {
+        setState(() {
+          messages.add({
+            'message': 'Image selected: ${croppedFile.path}',
+            'isUser': true,
+            'time': _getCurrentTime(),
+            'image': croppedFile.path
+          });
+        });
+      }
     }
+  }
+
+  Future<File?> _cropImage(String path) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.deepOrange,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+        ),
+        IOSUiSettings(
+          title: 'Crop Image',
+          minimumAspectRatio: 1.0,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio5x3,
+            CropAspectRatioPreset.ratio5x4,
+            CropAspectRatioPreset.ratio7x5,
+            CropAspectRatioPreset.ratio16x9
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile != null) {
+      return File(croppedFile.path);
+    }
+    return null;
   }
 
   Future<void> _requestPermission(Permission permission) async {
@@ -25,6 +115,11 @@ class ChatbotPage extends StatelessWidget {
     } else {
       print('Permission denied');
     }
+  }
+
+  String _getCurrentTime() {
+    final now = DateTime.now();
+    return '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -38,10 +133,37 @@ class ChatbotPage extends StatelessWidget {
         children: [
           ChatbotHeader(themeIndex: themeIndex),
           Expanded(
-            child: ChatMessagesList(themeIndex: themeIndex),
+            child: ListView.builder(
+              padding: EdgeInsets.all(16),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final showTime = index == 0 || messages[index]['time'] != messages[index - 1]['time'];
+                return Column(
+                  crossAxisAlignment: message['isUser'] ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  children: [
+                    if (showTime) _buildTimeText(message['time'], themeIndex),
+                    if (message.containsKey('image'))
+                      _buildImageBubble(message['image'], message['isUser'] ? Alignment.centerRight : Alignment.centerLeft),
+                    if (!message.containsKey('image'))
+                      _buildMessageBubble(
+                        context,
+                        message['message'],
+                        message['isUser']
+                            ? AppColors.getColor(themeIndex, 'messageUserBackground')
+                            : AppColors.getColor(themeIndex, 'messageBotBackground'),
+                        message['isUser'] ? Colors.black : Colors.black,
+                        message['isUser'] ? Alignment.centerRight : Alignment.centerLeft,
+                        themeIndex,
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
           ChatbotFooter(
             themeIndex: themeIndex,
+            textController: _textController,
             onMicroPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Micro pressed')),
@@ -55,102 +177,21 @@ class ChatbotPage extends StatelessWidget {
               await _requestPermission(Permission.photos);
               await _pickImage(context, ImageSource.gallery);
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ChatbotHeader extends StatelessWidget {
-  final int themeIndex;
-
-  const ChatbotHeader({Key? key, required this.themeIndex}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      height: 100,
-      color: AppColors.getColor(themeIndex, 'headerBackground'),
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
+            onSendPressed: () async {
+              if (_textController.text.isNotEmpty) {
+                final userMessage = _textController.text;
+                final currentTime = _getCurrentTime();
+                setState(() {
+                  messages.add({'message': userMessage, 'isUser': true, 'time': currentTime});
+                  _textController.clear();
+                });
+                chatbotService.sendMessage(userMessage);
+                print('Input: $userMessage');
+              }
             },
           ),
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.white,
-            child: Text(
-              'Logo App',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          SizedBox(width: 16),
-          Text(
-            'CHAT TITLE',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w700,
-            ),
-          ),
         ],
       ),
-    );
-  }
-}
-
-class ChatMessagesList extends StatelessWidget {
-  final int themeIndex;
-
-  const ChatMessagesList({Key? key, required this.themeIndex}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.all(16),
-      children: [
-        _buildTimeText('17:00', themeIndex),
-        _buildMessageBubble(
-            context,
-            'Give me an example of brain drain',
-            AppColors.getColor(themeIndex, 'messageUserBackground'),
-            Colors.black,
-            Alignment.centerRight,
-            themeIndex),
-        _buildMessageBubble(
-            context,
-            'There are different examples of the brain in real-life situations. One example is qualified people from developing nations being enticed by greater wages and better working conditions in nations from Western Europe, such as the U.S. They migrate from their countries to opt for such situations in the long run.',
-            AppColors.getColor(themeIndex, 'messageBotBackground'),
-            Colors.black,
-            Alignment.centerLeft,
-            themeIndex),
-        _buildTimeText('19:58', themeIndex),
-        _buildMessageBubble(
-            context,
-            'Other user’s question',
-            AppColors.getColor(themeIndex, 'messageUserBackground'),
-            Colors.black,
-            Alignment.centerRight,
-            themeIndex),
-        _buildMessageBubble(
-            context,
-            'Chatbot reply',
-            AppColors.getColor(themeIndex, 'messageBotBackground'),
-            Colors.black,
-            Alignment.centerLeft,
-            themeIndex),
-      ],
     );
   }
 
@@ -194,98 +235,118 @@ class ChatMessagesList extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildImageBubble(String imagePath, Alignment alignment) {
+    return Align(
+      alignment: alignment,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.file(
+            File(imagePath),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class ChatbotFooter extends StatefulWidget {
+class ChatbotHeader extends StatelessWidget {
   final int themeIndex;
-  final VoidCallback onMicroPressed;
-  final VoidCallback onCameraPressed;
-  final VoidCallback onGalleryPressed;
 
-  const ChatbotFooter({
-    Key? key,
-    required this.themeIndex,
-    required this.onMicroPressed,
-    required this.onCameraPressed,
-    required this.onGalleryPressed,
-  }) : super(key: key);
-
-  @override
-  _ChatbotFooterState createState() => _ChatbotFooterState();
-}
-
-class _ChatbotFooterState extends State<ChatbotFooter> {
-  String languageIconText = 'VNI';
+  const ChatbotHeader({Key? key, required this.themeIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.getColor(widget.themeIndex, 'footerBackground'),
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      height: 100,
+      color: AppColors.getColor(themeIndex, 'headerBackground'),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.white,
+            child: Text(
+              'Logo App',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'CHATBOT',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChatbotFooter extends StatelessWidget {
+  final int themeIndex;
+  final TextEditingController textController;
+  final VoidCallback onMicroPressed;
+  final VoidCallback onCameraPressed;
+  final VoidCallback onGalleryPressed;
+  final VoidCallback onSendPressed;
+
+  const ChatbotFooter({
+    Key? key,
+    required this.themeIndex,
+    required this.textController,
+    required this.onMicroPressed,
+    required this.onCameraPressed,
+    required this.onGalleryPressed,
+    required this.onSendPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.getColor(themeIndex, 'footerBackground'),
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Row(
         children: [
           IconButton(
             icon: Icon(Icons.mic),
             color: Colors.white,
-            onPressed: widget.onMicroPressed,
+            onPressed: onMicroPressed,
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
             color: Colors.white,
-            onPressed: widget.onCameraPressed,
+            onPressed: onCameraPressed,
           ),
           IconButton(
             icon: Icon(Icons.photo),
             color: Colors.white,
-            onPressed: widget.onGalleryPressed,
+            onPressed: onGalleryPressed,
           ),
-          PopupMenuButton<String>(
-            icon: Container(
-              width: 40,
-              height: 22,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(width: 1.5, color: Color(0xFFFFE6CA)),
-              ),
-              child: Center(
-                child: Text(
-                  languageIconText,
-                  style: TextStyle(
-                    color: Color(0xFFFFE6CA),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            onSelected: (String result) {
-              setState(() {
-                languageIconText = result;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Selected: $result')),
-              );
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'ENG',
-                child: Text('English - ENG'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'CHN',
-                child: Text('Chinese - CHN'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Settings',
-                child: Text('Settings'),
-              ),
-            ],
-          ),
-          SizedBox(width: 8),
           Expanded(
             child: TextField(
+              controller: textController,
               decoration: InputDecoration(
                 hintText: 'Type a message',
                 hintStyle: TextStyle(color: Colors.white),
@@ -297,7 +358,7 @@ class _ChatbotFooterState extends State<ChatbotFooter> {
           IconButton(
             icon: Icon(Icons.send),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: onSendPressed,
           ),
         ],
       ),
