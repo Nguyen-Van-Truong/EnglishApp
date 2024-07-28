@@ -5,36 +5,21 @@ import 'dart:async';
 
 class ChatbotService {
   final String baseUrl;
-  final StreamController<String> _streamController = StreamController<String>();
+  StreamController<String>? _streamController;
 
   ChatbotService({required this.baseUrl});
 
   void listenToSSE(Function(String) onEvent) {
     print('--Listen TO SSE---');
-    // SSEClient.subscribeToSSE(
-    //   method: SSERequestType.POST,
-    //   url: '$baseUrl/api/webhook',
-    //   header: {
-    //     "Accept": "text/event-stream",
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: {
-    //     "message": "hello",
-    //     "sender": "1"
-    //   },
-    // ).listen((event) {
-    //   print('Received event: ${event.data}');
-    //   if (event.data != null) {
-    //     _streamController.add(event.data!);
-    //   }
-    // }, onError: (e) {
-    //   print('Error: $e');
-    // });
-
-    _streamController.stream.listen(onEvent);
+    _streamController ??= StreamController<String>.broadcast();
+    _streamController!.stream.listen(onEvent);
   }
 
   void sendMessage(String message) {
+    if (_streamController == null || _streamController!.isClosed) {
+      _streamController = StreamController<String>.broadcast();
+    }
+
     SSEClient.subscribeToSSE(
       method: SSERequestType.POST,
       url: '$baseUrl/api/webhook',
@@ -48,16 +33,15 @@ class ChatbotService {
       },
     ).listen((event) {
       print('Received event:${event.data}');
-      if (event.data != null) {
-        _streamController.add(event.data!);
+      if (event.data != null && _streamController != null && !_streamController!.isClosed) {
+        _streamController!.add(event.data!);
       }
     }, onError: (e) {
       print('Error: $e');
     });
-
   }
 
   void dispose() {
-    _streamController.close();
+    _streamController?.close();
   }
 }

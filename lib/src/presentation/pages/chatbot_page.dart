@@ -16,13 +16,20 @@ class ChatbotPage extends StatefulWidget {
 
 class _ChatbotPageState extends State<ChatbotPage> {
   final ImagePicker _picker = ImagePicker();
-  final ChatbotService chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580');
+  late ChatbotService chatbotService;
   final TextEditingController _textController = TextEditingController();
   List<Map<String, dynamic>> messages = [];
+  bool isResponding = false;
+  bool isStopping = false; // New flag to control stopping
 
   @override
   void initState() {
     super.initState();
+    chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580');
+    _initializeChatbotService();
+  }
+
+  void _initializeChatbotService() {
     chatbotService.listenToSSE(_handleSSEEvent);
   }
 
@@ -33,11 +40,12 @@ class _ChatbotPageState extends State<ChatbotPage> {
   }
 
   void _handleSSEEvent(String event) {
+    if (isStopping) {
+      return;
+    }
     setState(() {
       if (event == '[END_STREAM_SSE\n]' || event.trim() == '[END_STREAM_SSE]') {
-        setState(() {
-          chatbotService.dispose();
-        });
+        _stopResponding();
         return;
       }
 
@@ -51,7 +59,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
       String currentEvent = event;
 
-      // Nếu event bắt đầu bằng khoảng trắng, trim và thêm khoảng trắng vào cuối message hiện tại
       if (currentEvent.startsWith('  ')) {
         currentEvent = currentEvent.trim();
         messages.last['message'] += ' ' + currentEvent;
@@ -59,7 +66,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
         messages.last['message'] += currentEvent.trim();
       }
     });
-    // print('Output:$event');
   }
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
@@ -117,10 +123,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       ],
     );
 
-    if (croppedFile != null) {
-      return File(croppedFile.path);
-    }
-    return null;
+    return croppedFile != null ? File(croppedFile.path) : null;
   }
 
   Future<void> _requestPermission(Permission permission) async {
@@ -135,6 +138,34 @@ class _ChatbotPageState extends State<ChatbotPage> {
   String _getCurrentTime() {
     final now = DateTime.now();
     return '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+  }
+
+  void _stopResponding() {
+    setState(() {
+      isResponding = false;
+      isStopping = false; // Reset stopping flag when stopped
+    });
+  }
+
+  void _sendMessage(String message) {
+    setState(() {
+      isResponding = true; // Set isResponding to true immediately when sending message
+      isStopping = false; // Ensure stopping is reset
+      messages.add({'message': message, 'isUser': true, 'time': _getCurrentTime()});
+      _textController.clear();
+    });
+    chatbotService.sendMessage(message);
+    print('Input: $message');
+  }
+
+  void _stopMessage() {
+    setState(() {
+      isStopping = true; // Set isStopping to true to stop processing events
+      _stopResponding(); // Call stop responding to update UI
+    });
+    chatbotService.dispose(); // Dispose the current chatbot service to stop receiving events
+    chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580'); // Reinitialize chatbot service for future use
+    _initializeChatbotService(); // Listen to new events
   }
 
   @override
@@ -193,17 +224,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
               await _pickImage(context, ImageSource.gallery);
             },
             onSendPressed: () async {
-              if (_textController.text.isNotEmpty) {
-                final userMessage = _textController.text;
-                final currentTime = _getCurrentTime();
-                setState(() {
-                  messages.add({'message': userMessage, 'isUser': true, 'time': currentTime});
-                  _textController.clear();
-                });
-                chatbotService.sendMessage(userMessage);
-                print('Input: $userMessage');
+              if (isResponding) {
+                _stopMessage(); // Stop message if currently responding
+              } else if (_textController.text.isNotEmpty) {
+                _sendMessage(_textController.text);
               }
             },
+            isResponding: isResponding,
           ),
         ],
       ),
@@ -326,6 +353,7 @@ class ChatbotFooter extends StatelessWidget {
   final VoidCallback onCameraPressed;
   final VoidCallback onGalleryPressed;
   final VoidCallback onSendPressed;
+  final bool isResponding;
 
   const ChatbotFooter({
     Key? key,
@@ -335,6 +363,7 @@ class ChatbotFooter extends StatelessWidget {
     required this.onCameraPressed,
     required this.onGalleryPressed,
     required this.onSendPressed,
+    required this.isResponding,
   }) : super(key: key);
 
   @override
@@ -371,8 +400,17 @@ class ChatbotFooter extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send),
-            color: Colors.white,
+            icon: isResponding
+                ? Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            )
+                : Icon(Icons.send, color: Colors.white),
             onPressed: onSendPressed,
           ),
         ],
