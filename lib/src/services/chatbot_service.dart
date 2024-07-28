@@ -47,7 +47,7 @@ class ChatbotService {
         "sender": "1"
       },
     ).listen((event) {
-      print('Received event: ${event.data}');
+      print('Received event:${event.data}');
       if (event.data != null) {
         _streamController.add(event.data!);
       }

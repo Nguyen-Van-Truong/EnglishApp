@@ -1,3 +1,4 @@
+// lib/src/presentation/pages/home2_page.dart
 import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
 import 'package:englishapp/src/presentation/pages/check_spelling_error_page.dart';
 import 'package:englishapp/src/presentation/pages/dictionary_page.dart';
@@ -43,7 +44,7 @@ class Home2 extends StatelessWidget {
               ],
             ),
           ),
-          _buildChatBubbles(themeIndex),
+          _buildChatBubbles(context, themeIndex),
         ],
       ),
     );
@@ -289,7 +290,7 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildChatBubbles(int themeIndex) {
+  Widget _buildChatBubbles(BuildContext context, int themeIndex) {
     return Positioned(
       bottom: 16,
       right: 16,
@@ -298,7 +299,7 @@ class Home2 extends StatelessWidget {
         children: [
           _buildTopChatBubble(themeIndex),
           const SizedBox(height: 8),
-          _buildBottomChatBubble(themeIndex),
+          _buildBottomChatBubble(context, themeIndex),
         ],
       ),
     );
@@ -359,26 +360,34 @@ class Home2 extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomChatBubble(int themeIndex) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: AppColors.getColor(themeIndex, 'chatBubbleBackground'),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Image.asset(
-        'lib/res/assets/icon_app/icon_chatbot.png',
-        width: 24,
-        height: 24,
+  Widget _buildBottomChatBubble(BuildContext context, int themeIndex) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ChatbotPage()),
+        );
+      },
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: AppColors.getColor(themeIndex, 'chatBubbleBackground'),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Image.asset(
+          'lib/res/assets/icon_app/icon_chatbot.png',
+          width: 24,
+          height: 24,
+        ),
       ),
     );
   }

@@ -19,7 +19,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
   final ChatbotService chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580');
   final TextEditingController _textController = TextEditingController();
   List<Map<String, dynamic>> messages = [];
-  String currentMessage = "";
 
   @override
   void initState() {
@@ -35,6 +34,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
   void _handleSSEEvent(String event) {
     setState(() {
+      if (event == '[END_STREAM_SSE\n]' || event.trim() == '[END_STREAM_SSE]') {
+        setState(() {
+          chatbotService.dispose();
+        });
+        return;
+      }
+
       if (messages.isEmpty || messages.last['isUser']) {
         messages.add({
           'message': '',
@@ -42,9 +48,18 @@ class _ChatbotPageState extends State<ChatbotPage> {
           'time': _getCurrentTime()
         });
       }
-      messages.last['message'] += event.trim();
+
+      String currentEvent = event;
+
+      // Nếu event bắt đầu bằng khoảng trắng, trim và thêm khoảng trắng vào cuối message hiện tại
+      if (currentEvent.startsWith('  ')) {
+        currentEvent = currentEvent.trim();
+        messages.last['message'] += ' ' + currentEvent;
+      } else {
+        messages.last['message'] += currentEvent.trim();
+      }
     });
-    print('Output: $currentMessage');
+    // print('Output:$event');
   }
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
