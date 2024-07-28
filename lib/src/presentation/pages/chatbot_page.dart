@@ -1,4 +1,3 @@
-// lib/src/presentation/pages/chatbot_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/services/chatbot_service.dart';
+import 'package:englishapp/src/database/database_helper.dart';
 
 class ChatbotPage extends StatefulWidget {
   @override
@@ -21,12 +21,15 @@ class _ChatbotPageState extends State<ChatbotPage> {
   List<Map<String, dynamic>> messages = [];
   bool isResponding = false;
   bool isStopping = false; // New flag to control stopping
+  late DatabaseHelper _dbHelper;
 
   @override
   void initState() {
     super.initState();
+    _dbHelper = DatabaseHelper();
     chatbotService = ChatbotService(baseUrl: 'http://35.184.119.129:8580');
     _initializeChatbotService();
+    _loadMessages(); // Tải lịch sử cuộc trò chuyện khi khởi động ứng dụng
   }
 
   void _initializeChatbotService() {
@@ -39,22 +42,43 @@ class _ChatbotPageState extends State<ChatbotPage> {
     super.dispose();
   }
 
+  Future<void> _loadMessages() async {
+    List<Map<String, dynamic>> loadedMessages = await _dbHelper.getMessages();
+    setState(() {
+      messages = List<Map<String, dynamic>>.from(loadedMessages);
+    });
+  }
+
+  Future<void> _saveMessage(Map<String, dynamic> message) async {
+    await _dbHelper.insertMessage(message);
+  }
+
+  Future<void> _clearMessages() async {
+    await _dbHelper.clearMessages();
+    setState(() {
+      messages.clear();
+    });
+  }
+
   void _handleSSEEvent(String event) {
     if (isStopping) {
       return;
     }
     setState(() {
       if (event == '[END_STREAM_SSE\n]' || event.trim() == '[END_STREAM_SSE]') {
+        print('Output:' + messages.last['message']);
         _stopResponding();
+        _saveMessage(messages.last);
         return;
       }
 
       if (messages.isEmpty || messages.last['isUser']) {
-        messages.add({
+        Map<String, dynamic> botMessage = {
           'message': '',
           'isUser': false,
           'time': _getCurrentTime()
-        });
+        };
+        messages.add(botMessage);
       }
 
       String currentEvent = event;
@@ -65,6 +89,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       } else {
         messages.last['message'] += currentEvent.trim();
       }
+
     });
   }
 
@@ -73,14 +98,16 @@ class _ChatbotPageState extends State<ChatbotPage> {
     if (pickedFile != null) {
       File? croppedFile = await _cropImage(pickedFile.path);
       if (croppedFile != null) {
+        Map<String, dynamic> imageMessage = {
+          'message': 'Image selected: ${croppedFile.path}',
+          'isUser': true,
+          'time': _getCurrentTime(),
+          'image': croppedFile.path
+        };
         setState(() {
-          messages.add({
-            'message': 'Image selected: ${croppedFile.path}',
-            'isUser': true,
-            'time': _getCurrentTime(),
-            'image': croppedFile.path
-          });
+          messages.add(imageMessage);
         });
+        _saveMessage(imageMessage);
       }
     }
   }
@@ -148,12 +175,18 @@ class _ChatbotPageState extends State<ChatbotPage> {
   }
 
   void _sendMessage(String message) {
+    Map<String, dynamic> userMessage = {
+      'message': message,
+      'isUser': true,
+      'time': _getCurrentTime()
+    };
     setState(() {
       isResponding = true; // Set isResponding to true immediately when sending message
       isStopping = false; // Ensure stopping is reset
-      messages.add({'message': message, 'isUser': true, 'time': _getCurrentTime()});
+      messages.add(userMessage);
       _textController.clear();
     });
+    _saveMessage(userMessage);
     chatbotService.sendMessage(message);
     print('Input: $message');
   }
@@ -177,7 +210,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
       backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       body: Column(
         children: [
-          ChatbotHeader(themeIndex: themeIndex),
+          ChatbotHeader(
+            themeIndex: themeIndex,
+            onClearPressed: _clearMessages, // Add the clear button handler
+          ),
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(16),
@@ -188,13 +224,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 return Column(
                   crossAxisAlignment: message['isUser'] ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    if (showTime) _buildTimeText(message['time'], themeIndex),
-                    if (message.containsKey('image'))
+                    if (showTime) _buildTimeText(message['time'] ?? '', themeIndex),
+                    if (message.containsKey('image') && message['image'] != null)
                       _buildImageBubble(message['image'], message['isUser'] ? Alignment.centerRight : Alignment.centerLeft),
-                    if (!message.containsKey('image'))
+                    if (!message.containsKey('image') || message['image'] == null)
                       _buildMessageBubble(
                         context,
-                        message['message'],
+                        message['message'] ?? '',
                         message['isUser']
                             ? AppColors.getColor(themeIndex, 'messageUserBackground')
                             : AppColors.getColor(themeIndex, 'messageBotBackground'),
@@ -297,8 +333,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
 class ChatbotHeader extends StatelessWidget {
   final int themeIndex;
+  final VoidCallback onClearPressed;
 
-  const ChatbotHeader({Key? key, required this.themeIndex}) : super(key: key);
+  const ChatbotHeader({Key? key, required this.themeIndex, required this.onClearPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -339,6 +376,10 @@ class ChatbotHeader extends StatelessWidget {
               ),
               overflow: TextOverflow.ellipsis,
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.white),
+            onPressed: onClearPressed,
           ),
         ],
       ),
