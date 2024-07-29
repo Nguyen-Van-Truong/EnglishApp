@@ -1,4 +1,5 @@
 // lib/src/presentation/pages/create_essay_page.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
@@ -6,6 +7,8 @@ import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CreateEssayPage extends StatefulWidget {
   @override
@@ -17,11 +20,24 @@ class _CreateEssayPageState extends State<CreateEssayPage> {
   final TextEditingController _contentController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
+  Future<void> _requestPermission(Permission permission) async {
+    final status = await permission.request();
+    if (status.isGranted) {
+      print('Permission granted');
+    } else {
+      print('Permission denied');
+    }
+  }
+
   Future<void> _scanImageToText(TextEditingController controller) async {
+    await _requestPermission(Permission.camera);
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image == null) return;
 
-    final inputImage = InputImage.fromFilePath(image.path);
+    File? croppedFile = await _cropImage(image.path);
+    if (croppedFile == null) return;
+
+    final inputImage = InputImage.fromFilePath(croppedFile.path);
     final textDetector = GoogleMlKit.vision.textDetector();
     final RecognisedText recognizedText = await textDetector.processImage(inputImage);
 
@@ -30,6 +46,47 @@ class _CreateEssayPageState extends State<CreateEssayPage> {
     });
 
     textDetector.close();
+  }
+
+  Future<File?> _cropImage(String path) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.deepOrange,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
+        ),
+        IOSUiSettings(
+          title: 'Crop Image',
+          minimumAspectRatio: 1.0,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio5x3,
+            CropAspectRatioPreset.ratio5x4,
+            CropAspectRatioPreset.ratio7x5,
+            CropAspectRatioPreset.ratio16x9,
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    return croppedFile != null ? File(croppedFile.path) : null;
   }
 
   @override
