@@ -7,7 +7,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
-import 'package:englishapp/src/services/typo_service.dart';
+import 'package:englishapp/src/services/check_spelling_service.dart';
+import 'package:englishapp/src/database/database_helper.dart';
 
 class CheckSpellingErrorPage extends StatefulWidget {
   @override
@@ -16,23 +17,98 @@ class CheckSpellingErrorPage extends StatefulWidget {
 
 class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
   final ImagePicker _picker = ImagePicker();
-  final TypoService typoService = TypoService(baseUrl: 'http://35.184.119.129:8550');
+  late CheckSpellingService checkSpellingService;
   final TextEditingController _textController = TextEditingController();
   List<Map<String, dynamic>> messages = [];
+  bool isResponding = false;
+  bool isStopping = false; // New flag to control stopping
+  late DatabaseHelper _dbHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    _dbHelper = DatabaseHelper();
+    checkSpellingService = CheckSpellingService(baseUrl: 'http://35.184.119.129:8580');
+    _initializeCheckSpellingService();
+    _loadMessages(); // Tải lịch sử cuộc trò chuyện khi khởi động ứng dụng
+  }
+
+  void _initializeCheckSpellingService() {
+    checkSpellingService.listenToSSE(_handleSSEEvent);
+  }
+
+  @override
+  void dispose() {
+    checkSpellingService.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMessages() async {
+    List<Map<String, dynamic>> loadedMessages = await _dbHelper.getMessages();
+    setState(() {
+      messages = List<Map<String, dynamic>>.from(loadedMessages);
+    });
+  }
+
+  Future<void> _saveMessage(Map<String, dynamic> message) async {
+    await _dbHelper.insertMessage(message);
+  }
+
+  Future<void> _clearMessages() async {
+    await _dbHelper.clearMessages();
+    setState(() {
+      messages.clear();
+    });
+  }
+
+  void _handleSSEEvent(String event) {
+    if (isStopping) {
+      return;
+    }
+    setState(() {
+      if (event == '[END_STREAM_SSE\n]' || event.trim() == '[END_STREAM_SSE]') {
+        print('Output:' + messages.last['message']);
+        _stopResponding();
+        _saveMessage(messages.last);
+        return;
+      }
+
+      if (messages.isEmpty || messages.last['isUser']) {
+        Map<String, dynamic> botMessage = {
+          'message': '',
+          'isUser': false,
+          'time': _getCurrentTime()
+        };
+        messages.add(botMessage);
+      }
+
+      String currentEvent = event;
+
+      if (currentEvent.startsWith('  ')) {
+        currentEvent = currentEvent.trim();
+        messages.last['message'] += ' ' + currentEvent;
+      } else {
+        messages.last['message'] += currentEvent.trim();
+      }
+
+    });
+  }
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       File? croppedFile = await _cropImage(pickedFile.path);
       if (croppedFile != null) {
+        Map<String, dynamic> imageMessage = {
+          'message': 'Image selected: ${croppedFile.path}',
+          'isUser': true,
+          'time': _getCurrentTime(),
+          'image': croppedFile.path
+        };
         setState(() {
-          messages.add({
-            'message': 'Image selected: ${croppedFile.path}',
-            'isUser': true,
-            'time': _getCurrentTime(),
-            'image': croppedFile.path
-          });
+          messages.add(imageMessage);
         });
+        _saveMessage(imageMessage);
       }
     }
   }
@@ -75,10 +151,7 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
       ],
     );
 
-    if (croppedFile != null) {
-      return File(croppedFile.path);
-    }
-    return null;
+    return croppedFile != null ? File(croppedFile.path) : null;
   }
 
   Future<void> _requestPermission(Permission permission) async {
@@ -90,22 +163,43 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
     }
   }
 
-  Future<void> _fixTypos(BuildContext context, String id, String submission) async {
-    try {
-      final result = await typoService.fixTypos(id, submission);
-      setState(() {
-        messages.add({'message': result, 'isUser': false, 'time': _getCurrentTime()});
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
-  }
-
   String _getCurrentTime() {
     final now = DateTime.now();
     return '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+  }
+
+  void _stopResponding() {
+    setState(() {
+      isResponding = false;
+      isStopping = false; // Reset stopping flag when stopped
+    });
+  }
+
+  void _sendMessage(String message) {
+    Map<String, dynamic> userMessage = {
+      'message': message,
+      'isUser': true,
+      'time': _getCurrentTime()
+    };
+    setState(() {
+      isResponding = true; // Set isResponding to true immediately when sending message
+      isStopping = false; // Ensure stopping is reset
+      messages.add(userMessage);
+      _textController.clear();
+    });
+    _saveMessage(userMessage);
+    checkSpellingService.sendMessage(message);
+    print('Input: $message');
+  }
+
+  void _stopMessage() {
+    setState(() {
+      isStopping = true; // Set isStopping to true to stop processing events
+      _stopResponding(); // Call stop responding to update UI
+    });
+    checkSpellingService.dispose(); // Dispose the current checkSpelling service to stop receiving events
+    checkSpellingService = CheckSpellingService(baseUrl: 'http://35.184.119.129:8580'); // Reinitialize checkSpelling service for future use
+    _initializeCheckSpellingService(); // Listen to new events
   }
 
   @override
@@ -114,10 +208,13 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
     final themeIndex = themeProvider.themeIndex;
 
     return Scaffold(
-      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
+      backgroundColor: AppColors.getColor(themeIndex, 'pageAndFooterBackgroundCenterCheckSpelling'),
       body: Column(
         children: [
-          CheckSpellingErrorHeader(themeIndex: themeIndex),
+          CheckSpellingHeader(
+            themeIndex: themeIndex,
+            onClearPressed: _clearMessages, // Add the clear button handler
+          ),
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(16),
@@ -128,13 +225,13 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
                 return Column(
                   crossAxisAlignment: message['isUser'] ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    if (showTime) _buildTimeText(message['time'], themeIndex),
-                    if (message.containsKey('image'))
+                    if (showTime) _buildTimeText(message['time'] ?? '', themeIndex),
+                    if (message.containsKey('image') && message['image'] != null)
                       _buildImageBubble(message['image'], message['isUser'] ? Alignment.centerRight : Alignment.centerLeft),
-                    if (!message.containsKey('image'))
+                    if (!message.containsKey('image') || message['image'] == null)
                       _buildMessageBubble(
                         context,
-                        message['message'],
+                        message['message'] ?? '',
                         message['isUser']
                             ? AppColors.getColor(themeIndex, 'messageUserBackground')
                             : AppColors.getColor(themeIndex, 'messageBotBackground'),
@@ -147,7 +244,7 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
               },
             ),
           ),
-          CheckSpellingErrorFooter(
+          CheckSpellingFooter(
             themeIndex: themeIndex,
             textController: _textController,
             onMicroPressed: () {
@@ -164,16 +261,13 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
               await _pickImage(context, ImageSource.gallery);
             },
             onSendPressed: () async {
-              if (_textController.text.isNotEmpty) {
-                final userMessage = _textController.text;
-                final currentTime = _getCurrentTime();
-                setState(() {
-                  messages.add({'message': userMessage, 'isUser': true, 'time': currentTime});
-                  _textController.clear();
-                });
-                await _fixTypos(context, 'unique_id', userMessage);
+              if (isResponding) {
+                _stopMessage(); // Stop message if currently responding
+              } else if (_textController.text.isNotEmpty) {
+                _sendMessage(_textController.text);
               }
             },
+            isResponding: isResponding,
           ),
         ],
       ),
@@ -238,10 +332,11 @@ class _CheckSpellingErrorPageState extends State<CheckSpellingErrorPage> {
   }
 }
 
-class CheckSpellingErrorHeader extends StatelessWidget {
+class CheckSpellingHeader extends StatelessWidget {
   final int themeIndex;
+  final VoidCallback onClearPressed;
 
-  const CheckSpellingErrorHeader({Key? key, required this.themeIndex}) : super(key: key);
+  const CheckSpellingHeader({Key? key, required this.themeIndex, required this.onClearPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +368,7 @@ class CheckSpellingErrorHeader extends StatelessWidget {
           SizedBox(width: 16),
           Expanded(
             child: Text(
-              'CHECK SPELLING ERROR',
+              'SPELLING CHECKER',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 25,
@@ -283,21 +378,26 @@ class CheckSpellingErrorHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.white),
+            onPressed: onClearPressed,
+          ),
         ],
       ),
     );
   }
 }
 
-class CheckSpellingErrorFooter extends StatelessWidget {
+class CheckSpellingFooter extends StatefulWidget {
   final int themeIndex;
   final TextEditingController textController;
   final VoidCallback onMicroPressed;
   final VoidCallback onCameraPressed;
   final VoidCallback onGalleryPressed;
   final VoidCallback onSendPressed;
+  final bool isResponding;
 
-  const CheckSpellingErrorFooter({
+  const CheckSpellingFooter({
     Key? key,
     required this.themeIndex,
     required this.textController,
@@ -305,45 +405,145 @@ class CheckSpellingErrorFooter extends StatelessWidget {
     required this.onCameraPressed,
     required this.onGalleryPressed,
     required this.onSendPressed,
+    required this.isResponding,
   }) : super(key: key);
+
+  @override
+  _CheckSpellingFooterState createState() => _CheckSpellingFooterState();
+}
+
+class _CheckSpellingFooterState extends State<CheckSpellingFooter> {
+  String languageIconText = 'VNI';
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.getColor(themeIndex, 'footerBackground'),
+      color: AppColors.getColor(widget.themeIndex, 'pageAndFooterBackgroundCenterCheckSpelling'),
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Row(
         children: [
           IconButton(
             icon: Icon(Icons.mic),
-            color: Colors.white,
-            onPressed: onMicroPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconCheckSpellingPrimary'),
+            onPressed: widget.onMicroPressed,
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
-            color: Colors.white,
-            onPressed: onCameraPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconCheckSpellingPrimary'),
+            onPressed: widget.onCameraPressed,
           ),
           IconButton(
             icon: Icon(Icons.photo),
-            color: Colors.white,
-            onPressed: onGalleryPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconCheckSpellingPrimary'),
+            onPressed: widget.onGalleryPressed,
           ),
-          Expanded(
-            child: TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                hintText: 'Type a message',
-                hintStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
+          PopupMenuButton<String>(
+            icon: Container(
+              width: 40,
+              height: 22,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  width: 1.5,
+                  color: AppColors.getColor(widget.themeIndex, 'iconCheckSpellingPrimary'),
+                ),
               ),
-              style: TextStyle(color: Colors.white),
+              child: Center(
+                child: Text(
+                  languageIconText,
+                  style: TextStyle(
+                    color: AppColors.getColor(widget.themeIndex, 'iconCheckSpellingPrimary'),
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            onSelected: (String result) {
+              setState(() {
+                languageIconText = result;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Selected: $result')),
+              );
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'ENG',
+                child: Text('English - ENG'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'CHN',
+                child: Text('Chinese - CHN'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'VNI',
+                child: Text('Vietnamese - VNI'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Settings',
+                child: Text('Settings'),
+              ),
+            ],
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: widget.textController,
+                      decoration: InputDecoration(
+                        hintText: 'Type a message',
+                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 8), // Move the circle to the right
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.orange, width: 2),
+                    ),
+                    child: Center(
+                      child: IconButton(
+                        padding: EdgeInsets.only(left: 0, bottom: 0), // Adjust the position
+                        icon: Icon(Icons.add, color: Colors.orange, size: 30),
+                        onPressed: () {
+                          // Add your desired functionality here
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send),
-            color: Colors.white,
-            onPressed: onSendPressed,
+            icon: widget.isResponding
+                ? Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            )
+                : Icon(Icons.send, color: Colors.orange),
+            onPressed: widget.onSendPressed,
           ),
         ],
       ),

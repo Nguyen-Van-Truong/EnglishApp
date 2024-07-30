@@ -207,7 +207,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
     final themeIndex = themeProvider.themeIndex;
 
     return Scaffold(
-      backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
+      backgroundColor: AppColors.getColor(themeIndex, 'pageAndFooterBackgroundCenterChatbot'),
       body: Column(
         children: [
           ChatbotHeader(
@@ -387,7 +387,7 @@ class ChatbotHeader extends StatelessWidget {
   }
 }
 
-class ChatbotFooter extends StatelessWidget {
+class ChatbotFooter extends StatefulWidget {
   final int themeIndex;
   final TextEditingController textController;
   final VoidCallback onMicroPressed;
@@ -408,40 +408,130 @@ class ChatbotFooter extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _ChatbotFooterState createState() => _ChatbotFooterState();
+}
+
+class _ChatbotFooterState extends State<ChatbotFooter> {
+  String languageIconText = 'VNI';
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.getColor(themeIndex, 'footerBackground'),
+      color: AppColors.getColor(widget.themeIndex, 'pageAndFooterBackgroundCenterChatbot'),
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Row(
         children: [
           IconButton(
             icon: Icon(Icons.mic),
-            color: Colors.white,
-            onPressed: onMicroPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconChatbotPrimary'),
+            onPressed: widget.onMicroPressed,
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
-            color: Colors.white,
-            onPressed: onCameraPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconChatbotPrimary'),
+            onPressed: widget.onCameraPressed,
           ),
           IconButton(
             icon: Icon(Icons.photo),
-            color: Colors.white,
-            onPressed: onGalleryPressed,
+            color: AppColors.getColor(widget.themeIndex, 'iconChatbotPrimary'),
+            onPressed: widget.onGalleryPressed,
           ),
-          Expanded(
-            child: TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                hintText: 'Type a message',
-                hintStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
+          PopupMenuButton<String>(
+            icon: Container(
+              width: 40,
+              height: 22,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  width: 1.5,
+                  color: AppColors.getColor(widget.themeIndex, 'iconChatbotPrimary'),
+                ),
               ),
-              style: TextStyle(color: Colors.white),
+              child: Center(
+                child: Text(
+                  languageIconText,
+                  style: TextStyle(
+                    color: AppColors.getColor(widget.themeIndex, 'iconChatbotPrimary'),
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            onSelected: (String result) {
+              setState(() {
+                languageIconText = result;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Selected: $result')),
+              );
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'ENG',
+                child: Text('English - ENG'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'CHN',
+                child: Text('Chinese - CHN'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'VNI',
+                child: Text('Vietnamese - VNI'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Settings',
+                child: Text('Settings'),
+              ),
+            ],
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: widget.textController,
+                      decoration: InputDecoration(
+                        hintText: 'Type a message',
+                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 8), // Move the circle to the right
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.orange, width: 2),
+                    ),
+                    child: Center(
+                      child: IconButton(
+                        padding: EdgeInsets.only(left: 0, bottom: 0), // Adjust the position
+                        icon: Icon(Icons.add, color: Colors.orange, size: 30),
+                        onPressed: () {
+                          // Add your desired functionality here
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           IconButton(
-            icon: isResponding
+            icon: widget.isResponding
                 ? Container(
               width: 24,
               height: 24,
@@ -451,8 +541,8 @@ class ChatbotFooter extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
               ),
             )
-                : Icon(Icons.send, color: Colors.white),
-            onPressed: onSendPressed,
+                : Icon(Icons.send, color: Colors.orange),
+            onPressed: widget.onSendPressed,
           ),
         ],
       ),

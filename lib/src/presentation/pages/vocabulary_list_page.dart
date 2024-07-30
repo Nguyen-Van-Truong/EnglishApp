@@ -51,13 +51,16 @@ class VocabularyListPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: AppColors.getColor(themeIndex, 'primaryText'),
-            fontSize: 18,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: AppColors.getColor(themeIndex, 'primaryText'),
+              fontSize: 18,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(
