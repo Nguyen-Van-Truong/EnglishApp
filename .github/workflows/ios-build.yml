@@ -1,48 +1,50 @@
-name: iOS-ipa-build
+name: Build iOS Flutter App
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-ios:
-    name: 🎉 iOS Build
+  build_ios:
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11
 
-      - uses: subosito/flutter-action@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: 'stable'
 
       - name: Flutter Pub Get
         run: flutter pub get
 
-      - name: Update CocoaPods repository
-        run: pod repo update
-        working-directory: ios
+      - name: Set up Xcode
+        run: sudo xcode-select -s /Applications/Xcode_12.4.app/Contents/Developer
 
-      - name: Build iOS Release
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS
+        run: flutter build ios --no-codesign
+        env:
+          FLUTTER_BUILD_NAME: 1.0.0
+          FLUTTER_BUILD_NUMBER: 1
 
-      - name: Create Payload Directory
-        run: mkdir -p Payload
-        working-directory: build/ios/iphoneos
+      - name: Archive the build
+        run: |
+          cd build/ios/iphoneos
+          zip -r app.zip Runner.app
 
-      - name: Move App to Payload
-        run: mv Runner.app Payload/
-        working-directory: build/ios/iphoneos
-
-      - name: Zip IPA
-        run: zip -r FlutterIpaExport.ipa Payload
-        working-directory: build/ios/iphoneos
-
-      - name: Upload IPA
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: FlutterIpaExport
-          path: build/ios/iphoneos/FlutterIpaExport.ipa
+          name: iOS-build
+          path: build/ios/iphoneos/app.zip
