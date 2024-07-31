@@ -38,13 +38,20 @@ jobs:
         FLUTTER_BUILD_NAME: 1.0.0
         FLUTTER_BUILD_NUMBER: 1
 
+    - name: Create IPA
+      run: |
+        xcodebuild -exportArchive \
+          -archivePath build/ios/archive/Runner.xcarchive \
+          -exportPath build/ios/ipa \
+          -exportOptionsPlist ExportOptions.plist
+
     - name: Archive the build
       run: |
-        cd build/ios/archive
-        zip -r app.zip Runner.xcarchive
+        cd build/ios/ipa
+        zip -r app.zip Runner.ipa
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: iOS-build
-        path: build/ios/archive/app.zip
+        path: build/ios/ipa/app.zip
