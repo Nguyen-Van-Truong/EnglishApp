@@ -40,11 +40,11 @@ jobs:
 
     - name: Archive the build
       run: |
-        cd build/ios/ipa
-        zip -r app.zip Runner.ipa
+        cd build/ios/archive
+        zip -r app.zip Runner.xcarchive
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: iOS-build
-        path: build/ios/ipa/app.zip
+        path: build/ios/archive/app.zip
