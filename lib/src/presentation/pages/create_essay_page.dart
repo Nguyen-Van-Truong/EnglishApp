@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
 import 'package:englishapp/src/presentation/pages/gradle_writing_exam_page.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -38,14 +38,14 @@ class _CreateEssayPageState extends State<CreateEssayPage> {
     if (croppedFile == null) return;
 
     final inputImage = InputImage.fromFilePath(croppedFile.path);
-    final textDetector = GoogleMlKit.vision.textDetector();
-    final RecognisedText recognizedText = await textDetector.processImage(inputImage);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
     setState(() {
       controller.text = recognizedText.text;
     });
 
-    textDetector.close();
+    textRecognizer.close();
   }
 
   Future<File?> _cropImage(String path) async {
