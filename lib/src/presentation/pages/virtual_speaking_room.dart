@@ -1,77 +1,51 @@
+// lib/src/presentation/pages/virtual_speaking_room.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class VirtualSpeakingRoom extends StatefulWidget {
+  final MediaStream localStream;
+  final bool isCameraOn;
+  final bool isMicOn;
+
+  VirtualSpeakingRoom({
+    required this.localStream,
+    required this.isCameraOn,
+    required this.isMicOn,
+  });
+
   @override
   _VirtualSpeakingRoomState createState() => _VirtualSpeakingRoomState();
 }
 
 class _VirtualSpeakingRoomState extends State<VirtualSpeakingRoom> {
-  final List<RTCVideoRenderer> _remoteRenderers = [];
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  MediaStream? _localStream;
+  bool _isCameraOn = true;
+  bool _isMicOn = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeRenderersAndPermissions();
+    _isCameraOn = widget.isCameraOn;
+    _isMicOn = widget.isMicOn;
+    _initializeRenderers();
+  }
+
+  Future<void> _initializeRenderers() async {
+    await _localRenderer.initialize();
+    _startLocalStream();
   }
 
   @override
   void dispose() {
     _localRenderer.dispose();
-    _localStream?.dispose();
-    for (var renderer in _remoteRenderers) {
-      renderer.dispose();
-    }
     super.dispose();
   }
 
-  Future<void> _initializeRenderersAndPermissions() async {
-    await _requestPermissions();
-    await _initializeRenderers();
-    await _startLocalStream();
-  }
-
-  Future<void> _requestPermissions() async {
-    final status = await [
-      Permission.camera,
-      Permission.microphone,
-    ].request();
-
-    if (status[Permission.camera] != PermissionStatus.granted ||
-        status[Permission.microphone] != PermissionStatus.granted) {
-      // Show a message to the user explaining why the permissions are necessary
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Camera and microphone permissions are required to use this feature.')),
-      );
-    }
-  }
-
-  Future<void> _initializeRenderers() async {
-    await _localRenderer.initialize();
-    // Initialize other renderers for remote streams if needed
-  }
-
   Future<void> _startLocalStream() async {
-    final Map<String, dynamic> mediaConstraints = {
-      'audio': true,
-      'video': {
-        'facingMode': 'user',
-      },
-    };
-
-    try {
-      _localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      _localRenderer.srcObject = _localStream;
-      setState(() {}); // Refresh the UI
-    } catch (e) {
-      print('Error starting local stream: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to access camera and microphone. Please check your settings.')),
-      );
-    }
+    _localRenderer.srcObject = widget.localStream;
+    final videoTrack = widget.localStream.getVideoTracks().first;
+    videoTrack.enabled = _isCameraOn;
+    setState(() {}); // Làm mới UI để hiển thị video stream
   }
 
   @override
@@ -89,48 +63,27 @@ class _VirtualSpeakingRoomState extends State<VirtualSpeakingRoom> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.white),
-            onPressed: () {
-              // Show meeting options
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Adjust based on number of participants
-                childAspectRatio: 1.0,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Container(
+                width: 150, // Thiết lập kích thước nhỏ hơn cho góc trái
+                height: 150,
+                margin: EdgeInsets.all(4.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 2.0),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: RTCVideoView(_localRenderer, mirror: true), // Hiển thị camera chính của người dùng
               ),
-              itemCount: _remoteRenderers.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _remoteRenderers.length) {
-                  // Place local renderer at the end (right side)
-                  return _buildVideoTile(_localRenderer, isLocal: true);
-                } else {
-                  return _buildVideoTile(_remoteRenderers[index]);
-                }
-              },
             ),
           ),
           _buildBottomBar(),
         ],
       ),
-    );
-  }
-
-  Widget _buildVideoTile(RTCVideoRenderer renderer, {bool isLocal = false}) {
-    return Container(
-      margin: EdgeInsets.all(4.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white, width: 2.0),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: RTCVideoView(renderer, mirror: isLocal),
     );
   }
 
@@ -141,18 +94,18 @@ class _VirtualSpeakingRoomState extends State<VirtualSpeakingRoom> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildBottomBarButton(Icons.mic_off, 'Mute', () {
-            // Handle mute/unmute
-          }),
-          _buildBottomBarButton(Icons.videocam_off, 'Camera', () {
-            // Handle camera on/off
-            _toggleCamera();
-          }),
-          _buildBottomBarButton(Icons.screen_share, 'Share Screen', () {
-            // Handle screen share
-          }),
+          _buildBottomBarButton(
+            _isMicOn ? Icons.mic : Icons.mic_off,
+            _isMicOn ? 'Mute' : 'Unmute',
+            _toggleMic,
+          ),
+          _buildBottomBarButton(
+            _isCameraOn ? Icons.videocam : Icons.videocam_off,
+            _isCameraOn ? 'Turn off camera' : 'Turn on camera',
+            _toggleCamera,
+          ),
           _buildBottomBarButton(Icons.call_end, 'End Call', () {
-            // Handle end call
+            Navigator.pop(context); // Thoát khỏi phòng họp
           }),
         ],
       ),
@@ -167,18 +120,24 @@ class _VirtualSpeakingRoomState extends State<VirtualSpeakingRoom> {
           icon: Icon(icon, color: Colors.white),
           onPressed: onPressed,
         ),
-        Text(
-          label,
-          style: TextStyle(color: Colors.white, fontSize: 12.0),
-        ),
+        Text(label, style: TextStyle(color: Colors.white, fontSize: 12.0)),
       ],
     );
   }
 
   void _toggleCamera() {
-    if (_localStream != null) {
-      final videoTrack = _localStream!.getVideoTracks().first;
-      videoTrack.enabled = !videoTrack.enabled;
-    }
+    final videoTrack = widget.localStream.getVideoTracks().first;
+    videoTrack.enabled = !videoTrack.enabled;
+    setState(() {
+      _isCameraOn = videoTrack.enabled;
+    });
+  }
+
+  void _toggleMic() {
+    final audioTrack = widget.localStream.getAudioTracks().first;
+    audioTrack.enabled = !audioTrack.enabled;
+    setState(() {
+      _isMicOn = audioTrack.enabled;
+    });
   }
 }

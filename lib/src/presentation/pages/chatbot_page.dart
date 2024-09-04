@@ -280,7 +280,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         time,
         style: TextStyle(
           color: AppColors.getColor(themeIndex, 'primaryText'),
-          fontSize: 12,
+          fontSize: 14,  // Increase font size
           fontFamily: 'Inter',
           fontWeight: FontWeight.w400,
         ),
@@ -306,7 +306,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
           message,
           style: TextStyle(
             color: textColor,
-            fontSize: 12,
+            fontSize: 14,  // Increase font size
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
           ),

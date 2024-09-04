@@ -1,3 +1,4 @@
+// lib/src/presentation/pages/exam_page.dart
 import 'package:englishapp/src/presentation/pages/dictionary_page.dart';
 import 'package:englishapp/src/presentation/pages/dictionary_page2.dart';
 import 'package:englishapp/src/presentation/pages/flashcard_page.dart';
@@ -12,12 +13,14 @@ import 'package:englishapp/src/presentation/pages/vocabulary_name_page.dart';
 import 'package:flutter/material.dart';
 import 'package:englishapp/src/presentation/pages/chatbot_page.dart';
 import 'package:englishapp/src/theme/colors.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/presentation/widgets/exam_card.dart';
 
 class ExamPage extends StatelessWidget {
-  const ExamPage({super.key});
+  final MediaStream? localStream; // Nhận localStream như một tham số
+  const ExamPage({super.key, this.localStream});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,8 @@ class ExamPage extends StatelessWidget {
       backgroundColor: AppColors.getColor(themeIndex, 'pageBackground'),
       appBar: AppBar(
         title: const Text('Shortcuts'),
-        backgroundColor: AppColors.getColor(themeIndex, 'navigationBarBackground'),
+        backgroundColor:
+        AppColors.getColor(themeIndex, 'navigationBarBackground'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,7 +63,6 @@ class ExamPage extends StatelessWidget {
                 );
               },
             ),
-
             const SizedBox(height: 16),
             ExamCard(
               title: 'Room Setup Page',
@@ -184,10 +187,26 @@ class ExamPage extends StatelessWidget {
               icon: Icons.chat,
               iconColor: Colors.blueAccent,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VirtualSpeakingRoom()),
-                );
+                if (localStream != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VirtualSpeakingRoom(
+                        localStream: localStream!,
+                        isCameraOn: true,
+                        isMicOn: true,
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'No local stream available. Please check camera and microphone settings.',
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ],
