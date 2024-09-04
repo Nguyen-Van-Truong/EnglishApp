@@ -17,6 +17,7 @@ import 'package:englishapp/src/utils/app_localizations.dart';
 
 import '../widgets/flash_sale_section.dart';
 import '../widgets/suggestion_section.dart';
+import 'dictionary_page2.dart';
 
 class Home2 extends StatelessWidget {
   @override
@@ -292,6 +293,12 @@ class Home2 extends StatelessWidget {
               'lib/res/assets/icon_app/Dictionary.png',
               themeIndex,
               DictionaryPage()),
+          _buildCard(
+              context,
+              localization?.translate('Dictionary2') ?? 'Dictionary2',
+              'lib/res/assets/icon_app/Dictionary.png',
+              themeIndex,
+              DictionaryPage2()),
           _buildCard(
               context,
               localization?.translate('virtual_speaking_room') ??

@@ -34,9 +34,9 @@ class ProfilePage2 extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildOverview(themeIndex),
                   const SizedBox(height: 16),
-                  _buildThemeOption(context, themeProvider, themeIndex), // Thêm dòng này
+                  _buildThemeOption(context, themeProvider, themeIndex),
                   const SizedBox(height: 16),
-                  _buildLanguageOption(context, themeProvider, themeIndex), // Thêm dòng này
+                  _buildLanguageOption(context, themeProvider, themeIndex),
                 ],
               ),
             ),
@@ -65,15 +65,11 @@ class ProfilePage2 extends StatelessWidget {
                   color: AppColors.getColor(themeIndex, 'headerCircle3'),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Center(
-                  child: Text(
-                    'Avatar',
-                    style: TextStyle(
-                      color: AppColors.getColor(themeIndex, 'primaryText'),
-                      fontSize: 12,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    'https://i.pinimg.com/originals/d3/57/82/d357827a68454feb305740bcabfc3ef7.jpg',
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -83,7 +79,7 @@ class ProfilePage2 extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'USERNAME',
+                      'Nguyễn Văn A', // Tên người dùng giả định
                       style: TextStyle(
                         color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                         fontSize: 23,
@@ -96,7 +92,7 @@ class ProfilePage2 extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'username',
+                            'a@gmail.com',
                             style: TextStyle(
                               color: AppColors.getColor(themeIndex, 'primaryTextHeader'),
                               fontSize: 12,
@@ -156,11 +152,11 @@ class ProfilePage2 extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8), // Khoảng cách nhỏ giữa button và icon
+                        const SizedBox(width: 8),
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white), // Border màu trắng
-                            borderRadius: BorderRadius.circular(4), // Bo tròn góc nếu cần
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                           child: Icon(
                             Icons.ios_share_outlined,
@@ -285,7 +281,7 @@ class ProfilePage2 extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset(iconPath, width: 24, height: 24), // Sử dụng hình ảnh tùy chỉnh
+                Image.asset(iconPath, width: 24, height: 24),
                 const SizedBox(width: 8),
                 Text(
                   count,
