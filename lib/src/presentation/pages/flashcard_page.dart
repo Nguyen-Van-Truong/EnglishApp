@@ -1,8 +1,30 @@
 // lib/src/presentation/pages/flashcard_page.dart
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:englishapp/src/theme/theme_provider.dart';
 import 'package:englishapp/src/theme/colors.dart';
+
+class Flashcard {
+  final String englishWord;
+  final String vietnameseMeaning;
+
+  Flashcard({required this.englishWord, required this.vietnameseMeaning});
+
+  Map<String, String> toJson() => {
+    'englishWord': englishWord,
+    'vietnameseMeaning': vietnameseMeaning,
+  };
+
+  factory Flashcard.fromJson(Map<String, dynamic> json) {
+    return Flashcard(
+      englishWord: json['englishWord'],
+      vietnameseMeaning: json['vietnameseMeaning'],
+    );
+  }
+}
 
 class FlashcardPage extends StatefulWidget {
   @override
@@ -11,7 +33,59 @@ class FlashcardPage extends StatefulWidget {
 
 class _FlashcardPageState extends State<FlashcardPage> {
   int currentIndex = 0;
-  final List<String> words = ['Word 1', 'Word 2', 'Word 3', 'Word 4', 'Word 5'];
+  List<Flashcard> flashcards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFlashcards();
+  }
+
+  Future<void> _loadFlashcards() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/flashcards.json');
+    if (await file.exists()) {
+      final jsonData = await file.readAsString();
+      final List<dynamic> loadedFlashcards = json.decode(jsonData);
+      setState(() {
+        flashcards = loadedFlashcards
+            .map((flashcardJson) => Flashcard.fromJson(flashcardJson))
+            .toList();
+      });
+    } else {
+      flashcards = [];
+      _saveFlashcards();
+    }
+  }
+
+  Future<void> _saveFlashcards() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/flashcards.json');
+    await file.writeAsString(
+        json.encode(flashcards.map((fc) => fc.toJson()).toList()));
+  }
+
+  void _addFlashcard(String englishWord, String vietnameseMeaning) {
+    setState(() {
+      flashcards.add(Flashcard(
+          englishWord: englishWord, vietnameseMeaning: vietnameseMeaning));
+      if (flashcards.length == 1) {
+        // Khi thêm flashcard đầu tiên, đặt currentIndex về 0
+        currentIndex = 0;
+      }
+    });
+    _saveFlashcards();
+  }
+
+  void _deleteFlashcard(int index) {
+    setState(() {
+      flashcards.removeAt(index);
+      if (currentIndex >= flashcards.length) {
+        currentIndex = flashcards.length - 1;
+      }
+    });
+    _saveFlashcards();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,22 +103,27 @@ class _FlashcardPageState extends State<FlashcardPage> {
             fontSize: 25,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w700,
-
           ),
         ),
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => _showAddFlashcardDialog(context),
+          ),
+        ],
       ),
       body: Column(
         children: [
           _buildHeader(themeIndex),
           _buildFlashcard(themeIndex),
           _buildNavigationButtons(themeIndex),
+          _buildDeleteButton(themeIndex),
         ],
       ),
-
     );
   }
 
@@ -62,7 +141,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(words.length, (index) {
+            children: List.generate(flashcards.length, (index) {
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4.0),
                 width: 35,
@@ -75,7 +154,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
                   border: Border.all(
                     color: index == currentIndex
                         ? AppColors.getColor(themeIndex, 'primaryTextHeader')
-                        : AppColors.getColor(themeIndex, 'primaryTextHeader').withOpacity(0.2),
+                        : AppColors.getColor(themeIndex, 'primaryTextHeader')
+                        .withOpacity(0.2),
                     width: 2,
                   ),
                 ),
@@ -107,18 +187,20 @@ class _FlashcardPageState extends State<FlashcardPage> {
           decoration: BoxDecoration(
             color: AppColors.getColor(themeIndex, 'cardBackground'),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+            border: Border.all(
+              color: AppColors.getColor(themeIndex, 'secondaryText')
+                  .withOpacity(0.25),
+            ),
           ),
-          child: Stack(
+          child: flashcards.isNotEmpty
+              ? Stack(
             children: [
               Center(
-                child: Row(
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.volume_up, size: 30, color: AppColors.getColor(themeIndex, 'primaryText')),
-                    SizedBox(width: 10),
                     Text(
-                      words[currentIndex],
+                      flashcards[currentIndex].englishWord,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.getColor(themeIndex, 'primaryText'),
@@ -127,34 +209,58 @@ class _FlashcardPageState extends State<FlashcardPage> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    SizedBox(height: 10),
+                    Text(
+                      flashcards[currentIndex].vietnameseMeaning,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.getColor(themeIndex, 'secondaryText'),
+                        fontSize: 25,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
-          ),
+          )
+              : Center(child: Text("No Flashcards")),
         ),
       ),
     );
   }
 
   Widget _buildNavigationButtons(int themeIndex) {
+    final isPreviousEnabled = flashcards.isNotEmpty && currentIndex > 0;
+    final isNextEnabled = flashcards.isNotEmpty && currentIndex < flashcards.length - 1;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ElevatedButton(
-            onPressed: () {
+            onPressed: isPreviousEnabled
+                ? () {
               setState(() {
-                currentIndex = (currentIndex - 1 + words.length) % words.length;
+                currentIndex = (currentIndex - 1) % flashcards.length;
               });
-            },
+            }
+                : null,
             style: ElevatedButton.styleFrom(
-              foregroundColor: AppColors.getColor(themeIndex, 'primaryText'),
+              foregroundColor: isPreviousEnabled
+                  ? AppColors.getColor(themeIndex, 'primaryText')
+                  : Colors.grey,
               backgroundColor: AppColors.getColor(themeIndex, 'cardBackground'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+                side: BorderSide(
+                  color: isPreviousEnabled
+                      ? AppColors.getColor(themeIndex, 'secondaryText')
+                      .withOpacity(0.25)
+                      : Colors.grey.withOpacity(0.25),
+                ),
               ),
             ),
             child: Text(
@@ -167,7 +273,9 @@ class _FlashcardPageState extends State<FlashcardPage> {
             ),
           ),
           Text(
-            '${currentIndex + 1}/${words.length}',
+            flashcards.isNotEmpty
+                ? '${currentIndex + 1}/${flashcards.length}'
+                : '0/0',
             style: TextStyle(
               color: AppColors.getColor(themeIndex, 'primaryText'),
               fontSize: 20,
@@ -176,17 +284,26 @@ class _FlashcardPageState extends State<FlashcardPage> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: isNextEnabled
+                ? () {
               setState(() {
-                currentIndex = (currentIndex + 1) % words.length;
+                currentIndex = (currentIndex + 1) % flashcards.length;
               });
-            },
+            }
+                : null,
             style: ElevatedButton.styleFrom(
-              foregroundColor: AppColors.getColor(themeIndex, 'primaryText'),
+              foregroundColor: isNextEnabled
+                  ? AppColors.getColor(themeIndex, 'primaryText')
+                  : Colors.grey,
               backgroundColor: AppColors.getColor(themeIndex, 'cardBackground'),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: AppColors.getColor(themeIndex, 'secondaryText').withOpacity(0.25)),
+                side: BorderSide(
+                  color: isNextEnabled
+                      ? AppColors.getColor(themeIndex, 'secondaryText')
+                      .withOpacity(0.25)
+                      : Colors.grey.withOpacity(0.25),
+                ),
               ),
             ),
             child: Text(
@@ -200,6 +317,80 @@ class _FlashcardPageState extends State<FlashcardPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDeleteButton(int themeIndex) {
+    return flashcards.isNotEmpty
+        ? Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          _deleteFlashcard(currentIndex);
+        },
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: Text(
+          'Delete Flashcard',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    )
+        : Container();
+  }
+
+  void _showAddFlashcardDialog(BuildContext context) {
+    TextEditingController englishController = TextEditingController();
+    TextEditingController vietnameseController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Flashcard'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: englishController,
+                decoration: InputDecoration(hintText: 'Enter English word'),
+              ),
+              TextField(
+                controller: vietnameseController,
+                decoration: InputDecoration(hintText: 'Enter Vietnamese meaning'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Save'),
+              onPressed: () {
+                if (englishController.text.isNotEmpty &&
+                    vietnameseController.text.isNotEmpty) {
+                  _addFlashcard(englishController.text,
+                      vietnameseController.text);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
